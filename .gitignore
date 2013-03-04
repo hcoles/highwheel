@@ -10,3 +10,4 @@ target/*
 */.settings/*
 */.classpath
 */bin/*
+.settings/*
