@@ -40,7 +40,6 @@ public class AnalyseTask extends Task {
   private Filter filter;
   private Path   analysisPath;
   private String accessRules;
-  private Path   entryPointPath;
 
   public void setFilter(final String glob) {
     this.filter = makeFilter(glob);
@@ -132,22 +131,6 @@ public class AnalyseTask extends Task {
     }
   }
 
-  public Path createEntryPointPath() {
-    if (this.entryPointPath == null) {
-      this.entryPointPath = new Path(getProject());
-    }
-    return this.entryPointPath.createPath();
-  }
-
-  public void setEntryPointPath(final Path src) {
-    if (isNonEmpty(src)) {
-      if (this.entryPointPath == null) {
-        this.entryPointPath = src;
-      } else {
-        this.entryPointPath.append(src);
-      }
-    }
-  }
 
   public Path createAnalysisPath() {
     if (this.analysisPath == null) {
@@ -162,11 +145,6 @@ public class AnalyseTask extends Task {
     path.toString(); // throws on error
   }
 
-  public void setEntryPointPathRef(final Reference r) {
-    final Path path = this.createEntryPointPath();
-    path.setRefid(r);
-    path.toString(); // throws on error
-  }
 
   private boolean isNonEmpty(final Path src) {
     for (final String anElementList : src.list()) {
