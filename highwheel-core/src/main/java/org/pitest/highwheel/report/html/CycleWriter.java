@@ -99,10 +99,11 @@ class CycleWriter extends BaseWriter {
       final DirectedGraph<ElementName, Dependency> cycle) {
     write(stream, "<section class='deps'>");
     write(stream, "<h1>Class dependencies</h1>");
-    write(stream, "<table>");
+    write(stream, "<table id=\"sorttable\" class=\"tablesorter\">");
     write(
         stream,
-        "<tr><thead><th>distance</th><th>from</th><th>type</th><th>to</th></thead></tr>");
+        "<thead><tr><th>distance</th><th>from</th><th>type</th><th>to</th></tr></thead>");
+    write(stream, "<tbody>");
     for (final Dependency element : cycle.getEdges()) {
       for (final Access each : element.consituents()) {
         write(stream, "<tr><td>" + showNumber(this.stats.getDistance(each))
@@ -110,6 +111,7 @@ class CycleWriter extends BaseWriter {
             + "</td><td>" + each.getDest() + "</td></tr>");
       }
     }
+    write(stream, "</tbody>");
     write(stream, "</table>");
     write(stream, "</section>");
 

@@ -18,6 +18,15 @@ public class BaseHtmlWriter {
     write(stream, "<!DOCTYPE HTML><html>");
     write(stream, "<head>");
     write(stream, "<link rel=\"stylesheet\" href=\"style.css\">");
+    
+    write(stream,"<script type=\"text/javascript\" src=\"jquery-latest.js\"></script>");
+    write(stream,"<script type=\"text/javascript\" src=\"jquery.tablesorter.min.js\"></script>");
+    
+    write(stream, "<script type=\"text/javascript\">");
+    write(stream, "$(document).ready(function() { $(\"#sorttable\").tablesorter(); } );");
+    write(stream, "</script>");  
+
+    
     write(stream, "</head>");
     write(stream, "<body>");
     write(stream, "<article>");

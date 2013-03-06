@@ -22,8 +22,15 @@ class ResourceWriter implements CycleReporter {
   }
 
   public void start(final CodeStats stats) {
-    final String resource = "style.css";
-    
+    writeResource("style.css");
+    writeResource("jquery-latest.js");
+    writeResource("jquery.tablesorter.min.js");    
+    writeResource("asc.gif");
+    writeResource("bg.gif");
+    writeResource("desc.gif");
+  }
+
+  private void writeResource(final String resource) {
     // context class loader does not resolve resource when running via ant task
     final InputStream is = getClass().getClassLoader().
         getResourceAsStream(resource);
@@ -36,7 +43,6 @@ class ResourceWriter implements CycleReporter {
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
-    
   }
 
   public void visitClassSubCycle(

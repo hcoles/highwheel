@@ -19,13 +19,15 @@ class PackagesWriter extends BaseWriter {
     writeHeader(FILENAME);
 
     write(FILENAME, "<section class ='deps'>");
-    write(FILENAME, "<table><tr><th>class</th><th>influence</th></tr>");
+    write(FILENAME, "<table id=\"sorttable\" class=\"tablesorter\"><thead><tr><th>package</th><th>influence</th></tr></thead>");
+    write(FILENAME, "<tbody>");
     for (final ElementName each : stats.getPackages()) {
       write(FILENAME,
           "<tr><td>" + each + "</td><td>"
               + stats.getPackageStats(each).getPageRank() + "</td></tr>");
     }
     write(FILENAME, "</tr>");
+    write(FILENAME, "</tbody>");
     write(FILENAME, "</table>");
     write(FILENAME, "</section");
     writeFooter(FILENAME);
