@@ -36,6 +36,11 @@ section.subcycle figure {
     margin-top: -60px;
 }
 
+section.subcycle a {
+    float: right;
+    margin-right: 40px;
+}
+
 .cons table {
  border-spacing: 4px;	
 }

@@ -51,6 +51,8 @@ class CycleWriter extends BaseWriter {
       write(streamName, "</figure>");
 
       writeConnections(streamName, cycle);
+      
+      write(streamName, "<a href='#classConnections'>jump to class connections</a>");
 
       write(streamName, "</section>");
     } catch (final IOException e) {
@@ -97,8 +99,9 @@ class CycleWriter extends BaseWriter {
 
   private void writeClassConnections(final String stream,
       final DirectedGraph<ElementName, Dependency> cycle) {
-    write(stream, "<section class='deps'>");
+    write(stream, "<section id='classConnections' class='deps'>");
     write(stream, "<h1>Class dependencies</h1>");
+    write(stream, "<a name='classConnections'/>");
     write(stream, "<table id=\"sorttable\" class=\"tablesorter\">");
     write(
         stream,
