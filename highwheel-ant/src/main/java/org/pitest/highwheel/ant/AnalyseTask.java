@@ -162,10 +162,6 @@ public class AnalyseTask extends Task {
     this.accessRules = accessRules;
   }
 
-  public File getOutputDir() {
-    return this.outputDir;
-  }
-
   public void setOutputDir(final File outputDir) {
     this.outputDir = outputDir;
   }

@@ -1,5 +1,6 @@
 package org.pitest.highwheel.ant;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -18,6 +19,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.types.Reference;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -111,6 +113,23 @@ public class AnalyseTaskTest {
     verify(p1).append(p2);
   }
 
+  @Test
+  public void shouldUseReferencePath() throws IOException {
+    setMandatoryProperties();
+    Path p = new Path(project, "/foo");
+    when(this.project.getReference("foo")).thenReturn(p);
+    Reference r = new Reference(this.project, "foo");
+    testee.setProject(this.project);
+    testee.setAnalysisPathRef(r);
+    
+    this.testee.execute();
+
+    final ArgumentCaptor<Path> actualPath = ArgumentCaptor
+        .forClass(Path.class);
+    verify(this.parser).parse(actualPath.capture(), any(Filter.class));
+    assertThat(actualPath.getValue().list()).containsOnly("/foo");
+  }
+  
   @Test
   public void shouldFilterClassPathWithSuppliedFilter() throws IOException {
     this.testee.setFilter("*.Foo.*");
