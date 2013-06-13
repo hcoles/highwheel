@@ -46,7 +46,9 @@ All options can of course be configured in your pom.xml.
 
 Seperate goal dumps decompiled to disk
 
+```bash
 mvn org.pitest:highwheel-bytecode:asmDump
+```
 
 ## Ant
 
