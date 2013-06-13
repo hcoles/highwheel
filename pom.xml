@@ -41,6 +41,7 @@
         <module>highwheel-parser</module>
         <module>highwheel-maven</module>
         <module>highwheel-ant</module>
+        <module>highwheel-bytecode</module>
     </modules>
 
     <!-- common dependencies used in all subprojects -->

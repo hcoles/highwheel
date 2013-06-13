@@ -7,10 +7,10 @@
 		<groupId>org.pitest</groupId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>highwheel-maven</artifactId>
+	<artifactId>highwheel-bytecode</artifactId>
 	<packaging>maven-plugin</packaging>
-	<name>highwheel-maven</name>
-	<description>Highwheel Maven Mojo.</description>
+	<name>highwheel-bytecode</name>
+	<description>Highwheel bytecode dump Mojo.</description>
 	<url>http://pitest.org</url>
 
 	<dependencies>
@@ -19,7 +19,11 @@
 			<artifactId>highwheel-parser</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.pitest</groupId>
+			<artifactId>highwheel-maven</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
@@ -70,5 +74,11 @@
 			<scope>test</scope>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm-util</artifactId>
+			<version>4.0</version>
+		</dependency>
+
 	</dependencies>
 </project>

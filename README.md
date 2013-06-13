@@ -44,6 +44,10 @@ mvn -DclassFilter=com.bigcompany.* org.pitest:highwheel-maven:analyse
 
 All options can of course be configured in your pom.xml.
 
+Seperate goal dumps decompiled to disk
+
+mvn org.pitest:highwheel-bytecode:asmDump
+
 ## Ant
 
 Create a task and pass in an analysisPath and filter
