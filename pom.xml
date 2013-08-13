@@ -7,11 +7,11 @@
     <version>0.1-SNAPSHOT</version>
     <name>highwheel-parent</name>
     <url>http://pitest.org</url>
-    <description>Graph based tools for better software</description>
+    <description>Visualise large class and package cycles</description>
     <scm>
-        <connection>scm:hg:https://pitestrunner.googlecode.com/hg/</connection>
-        <developerConnection>scm:hg:https://pitestrunner.googlecode.com/hg/</developerConnection>
-        <url>http://code.google.com/p/pitestrunner/source/browse/</url>
+        <connection>scm:git:https://github.com/hcoles/highwheel.git</connection>
+        <developerConnection>scm:git:https://github.com/hcoles/highwheel.git</developerConnection>
+        <url>https://github.com/hcoles/highwheel</url>
     </scm>
 
     <licenses>
