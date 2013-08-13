@@ -44,7 +44,7 @@ mvn -DclassFilter=com.bigcompany.* org.pitest:highwheel-maven:analyse
 
 All options can of course be configured in your pom.xml.
 
-Seperate goal dumps decompiled to disk
+Seperate goal dumps decompiled bytecode to disk
 
 ```bash
 mvn org.pitest:highwheel-bytecode:asmDump
