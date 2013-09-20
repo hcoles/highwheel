@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.Test;
+import org.pitest.highwheel.algorithm.Cycle;
 import org.pitest.highwheel.algorithm.ElementalCycleFinder;
 import org.pitest.highwheel.algorithm.SCCFinder;
-import org.pitest.highwheel.model.Cycle;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 

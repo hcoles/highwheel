@@ -1,4 +1,4 @@
-package org.pitest.highwheel;
+package org.pitest.highwheel.algorithm;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -7,8 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.pitest.highwheel.algorithm.SCCFinder;
-import org.pitest.highwheel.model.Cycle;
+import org.pitest.highwheel.DirectedGraphMother;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;

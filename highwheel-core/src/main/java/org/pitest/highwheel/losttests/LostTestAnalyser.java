@@ -6,22 +6,19 @@ import org.pitest.highwheel.model.ElementName;
 public class LostTestAnalyser {
 
   public void analyse(final ClasspathRoot mainRoot,
-      final ClasspathRoot testRoot) {
+      final ClasspathRoot testRoot, LostTestVisitor visitor) {
     final TesteeGuesser testeeGuesser = new TesteeGuesser(mainRoot);
-    System.out.println("Scanning " + testRoot.classNames().size() + " tests");
-    for (final ElementName each : mainRoot.classNames()) {
+    visitor.start();
+    for (final ElementName each : testRoot.classNames()) {
       final ElementName testee = testeeGuesser.guessTestee(each);
       if (testee != null) {
         if (!testee.getParent().equals(each.getParent())) {
-          System.out.println(each
-              + " may be in wrong package. Consider moving to "
-              + testee.getParent() + " where possible testee " + testee
-              + " lives");
+          visitor.visitLostTest(each, testee);
         }
       }
     }
+    visitor.end();
 
   }
   
-
 }

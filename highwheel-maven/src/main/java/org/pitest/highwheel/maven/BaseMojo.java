@@ -79,7 +79,7 @@ public abstract class BaseMojo extends AbstractMojo {
 
   }
 
-  private F<MavenProject, File> testDir() {
+  private static F<MavenProject, File> testDir() {
     return new F<MavenProject, File>() {
       public File apply(final MavenProject a) {
         return new File(a.getBuild().getTestOutputDirectory());
@@ -122,9 +122,8 @@ public abstract class BaseMojo extends AbstractMojo {
       this.getLog().warn("Cannot read from " + f.getAbsolutePath());
     }
     this.getLog().info(
-        "Including dir " + project.getBuild().getOutputDirectory());
-    return new DirectoryClassPathRoot(new File(project.getBuild()
-        .getOutputDirectory()));
+        "Including dir " + f);
+    return new DirectoryClassPathRoot(f);
   }
 
   protected abstract void analyse(final ClasspathRoot mainRoot,

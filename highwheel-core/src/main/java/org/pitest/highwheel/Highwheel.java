@@ -10,6 +10,8 @@ import org.pitest.highwheel.cycles.CodeGraphs;
 import org.pitest.highwheel.cycles.CycleAnalyser;
 import org.pitest.highwheel.cycles.CycleReporter;
 import org.pitest.highwheel.losttests.LostTestAnalyser;
+import org.pitest.highwheel.losttests.LostTestHTMLVisitor;
+import org.pitest.highwheel.losttests.LostTestVisitor;
 import org.pitest.highwheel.model.Dependency;
 import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.oracle.DependencyOracle;
@@ -50,8 +52,9 @@ public class Highwheel {
     cycleAnalyser.analyse(g, r);
 
     if (testRoot != null) {
+      LostTestVisitor visitor = new LostTestHTMLVisitor(this.fsf);
       final LostTestAnalyser lostTestAnalyser = new LostTestAnalyser();
-      lostTestAnalyser.analyse(mainRoot, testRoot);
+      lostTestAnalyser.analyse(mainRoot, testRoot,visitor);
     }
   }
 

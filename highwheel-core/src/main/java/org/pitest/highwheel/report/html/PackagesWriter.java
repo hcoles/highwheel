@@ -26,7 +26,6 @@ class PackagesWriter extends BaseWriter {
           "<tr><td>" + each + "</td><td>"
               + stats.getPackageStats(each).getPageRank() + "</td></tr>");
     }
-    write(FILENAME, "</tr>");
     write(FILENAME, "</tbody>");
     write(FILENAME, "</table>");
     write(FILENAME, "</section");

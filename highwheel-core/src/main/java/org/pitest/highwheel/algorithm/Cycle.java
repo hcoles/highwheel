@@ -1,9 +1,11 @@
-package org.pitest.highwheel.model;
+package org.pitest.highwheel.algorithm;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.pitest.highwheel.model.ElementName;
 
 public class Cycle<V> implements Iterable<V> {
 

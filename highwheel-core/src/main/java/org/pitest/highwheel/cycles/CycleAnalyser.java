@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections15.Predicate;
+import org.pitest.highwheel.algorithm.Cycle;
 import org.pitest.highwheel.algorithm.ElementalCycleFinder;
 import org.pitest.highwheel.algorithm.SCCFinder;
-import org.pitest.highwheel.model.Cycle;
 import org.pitest.highwheel.model.Dependency;
 import org.pitest.highwheel.model.ElementName;
 

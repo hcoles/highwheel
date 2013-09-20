@@ -20,7 +20,7 @@ import org.pitest.highwheel.report.FileStreamFactory;
  * 
  * @goal analyse
  * 
- * @requiresDependencyResolution compile
+ * @requiresDependencyResolution test
  * 
  */
 public class AnalyseMojo extends BaseMojo {

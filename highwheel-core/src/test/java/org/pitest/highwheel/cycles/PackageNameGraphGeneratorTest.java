@@ -1,4 +1,4 @@
-package org.pitest.highwheel;
+package org.pitest.highwheel.cycles;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
