@@ -1,4 +1,4 @@
-package org.pitest.highwheel.cycles;
+package org.pitest.highwheel.classpath;
 
 import org.pitest.highwheel.model.AccessPoint;
 import org.pitest.highwheel.model.AccessType;

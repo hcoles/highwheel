@@ -1,4 +1,4 @@
-package org.pitest.highwheel.classpath;
+package org.pitest.highwheel.bytecodeparser.classpath;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.pitest.highwheel.bytecodeparser.classpath.ArchiveClassPathRoot;
 import org.pitest.highwheel.model.ElementName;
 
 public class ArchiveClassPathRootTest {

@@ -1,4 +1,4 @@
-package org.pitest.highwheel.classpath;
+package org.pitest.highwheel.bytecodeparser.classpath;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.pitest.highwheel.bytecodeparser.classpath.DependencyClassPathRoot;
+import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.model.ElementName;
 
 public class DependencyClassPathRootTest {

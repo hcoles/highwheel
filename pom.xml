@@ -37,6 +37,7 @@
     </parent>
 
     <modules>
+        <module>highwheel-model</module>    
         <module>highwheel-core</module>
         <module>highwheel-parser</module>
         <module>highwheel-maven</module>

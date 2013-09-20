@@ -1,4 +1,4 @@
-package org.pitest.highwheel.classpath;
+package org.pitest.highwheel.bytecodeparser.classpath;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.junit.Test;
+import org.pitest.highwheel.bytecodeparser.classpath.DirectoryClassPathRoot;
 import org.pitest.highwheel.model.ElementName;
 
 public class DirectoryClassPathRootTest {

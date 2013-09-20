@@ -1,6 +1,6 @@
 package org.pitest.highwheel.bytecodeparser;
 
-import org.pitest.highwheel.cycles.AccessVisitor;
+import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.AccessPoint;
 import org.pitest.highwheel.model.AccessType;

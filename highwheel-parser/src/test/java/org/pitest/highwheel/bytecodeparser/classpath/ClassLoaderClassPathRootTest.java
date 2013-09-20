@@ -1,4 +1,4 @@
-package org.pitest.highwheel.classpath;
+package org.pitest.highwheel.bytecodeparser.classpath;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.pitest.highwheel.bytecodeparser.classpath.ClassLoaderClassPathRoot;
 import org.pitest.highwheel.model.ElementName;
 
 public class ClassLoaderClassPathRootTest {

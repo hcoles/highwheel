@@ -54,6 +54,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.pitest</groupId>
+			<artifactId>highwheel-model</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.pitest</groupId>
 			<artifactId>highwheel-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>

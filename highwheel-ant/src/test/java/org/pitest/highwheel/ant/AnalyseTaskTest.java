@@ -1,8 +1,6 @@
 package org.pitest.highwheel.ant;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -28,13 +26,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.pitest.highwheel.cycles.Filter;
-import org.pitest.highwheel.model.Dependency;
-import org.pitest.highwheel.model.ElementName;
+import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.report.FileStreamFactory;
-
-import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
 
 public class AnalyseTaskTest {
 
@@ -57,15 +50,17 @@ public class AnalyseTaskTest {
 
   @Mock
   private FileStreamFactory fsf;
+  
+  @Mock
+  private ClasspathRoot cpr;
 
   @Before
   public void setUp() throws IOException {
     MockitoAnnotations.initMocks(this);
     this.testee = new AnalyseTask(this.parser, this.output);
     this.testee.setOwningTarget(this.target);
-    final DirectedGraph<ElementName, Dependency> emptyGraph = new DirectedSparseGraph<ElementName, Dependency>();
-    when(this.parser.parse(any(Path.class), any(Filter.class))).thenReturn(
-        emptyGraph);
+    //final DirectedGraph<ElementName, Dependency> emptyGraph = new DirectedSparseGraph<ElementName, Dependency>();
+    when(this.parser.parse(any(Path.class))).thenReturn(cpr);
     when(this.target.getProject()).thenReturn(this.project);
     when(this.output.get(any(File.class))).thenReturn(this.fsf);
     when(this.fsf.getStream(anyString())).thenReturn(
@@ -86,7 +81,7 @@ public class AnalyseTaskTest {
     when(p.list()).thenReturn(new String[] { "foo", "bar" });
     this.testee.setAnalysisPath(p);
     this.testee.execute();
-    verify(this.parser).parse(eq(p), any(Filter.class));
+    verify(this.parser).parse(eq(p));
   }
 
   @Test
@@ -96,7 +91,7 @@ public class AnalyseTaskTest {
     when(p.list()).thenReturn(new String[] { "", "" });
     this.testee.setAnalysisPath(p);
     this.testee.execute();
-    verify(this.parser, never()).parse(eq(p), any(Filter.class));
+    verify(this.parser, never()).parse(eq(p));
   }
 
   @Test
@@ -126,25 +121,10 @@ public class AnalyseTaskTest {
 
     final ArgumentCaptor<Path> actualPath = ArgumentCaptor
         .forClass(Path.class);
-    verify(this.parser).parse(actualPath.capture(), any(Filter.class));
+    verify(this.parser).parse(actualPath.capture());
     assertThat(actualPath.getValue().list()).containsOnly("/foo");
   }
   
-  @Test
-  public void shouldFilterClassPathWithSuppliedFilter() throws IOException {
-    this.testee.setFilter("*.Foo.*");
-    this.testee.execute();
-
-    final ArgumentCaptor<Filter> actualFilter = ArgumentCaptor
-        .forClass(Filter.class);
-    verify(this.parser).parse(any(Path.class), actualFilter.capture());
-
-    assertTrue(actualFilter.getValue().include(
-        ElementName.fromString("com.Foo.bar")));
-    assertFalse(actualFilter.getValue().include(
-        ElementName.fromString("com.NoMatch.bar")));
-  }
-
   @Test
   public void shouldWriteToOutputDirWhenOneSupplied() {
     setMandatoryProperties();

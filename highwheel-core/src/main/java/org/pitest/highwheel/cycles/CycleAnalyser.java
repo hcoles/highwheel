@@ -33,7 +33,7 @@ public class CycleAnalyser {
     this.cycleSubAnalysisThreshold = cycleSubAnalysisThreshold;
   }
 
-  public void analyse(final CodeGraphs       graphs, final CycleReporter visitor) {
+  public void analyse(final CodeGraphs  graphs, final CycleReporter visitor) {
 
     generateStats(visitor, graphs);
     findClassTangles(visitor, graphs);

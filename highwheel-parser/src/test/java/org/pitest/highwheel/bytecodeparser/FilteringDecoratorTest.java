@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.pitest.highwheel.cycles.AccessVisitor;
+import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.AccessPoint;
 import org.pitest.highwheel.model.AccessType;

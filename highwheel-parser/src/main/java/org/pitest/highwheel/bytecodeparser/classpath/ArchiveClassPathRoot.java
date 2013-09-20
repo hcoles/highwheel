@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
  * See the License for the specific language governing permissions and limitations under the License. 
  */
-package org.pitest.highwheel.classpath;
+package org.pitest.highwheel.bytecodeparser.classpath;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.util.StreamUtil;
 

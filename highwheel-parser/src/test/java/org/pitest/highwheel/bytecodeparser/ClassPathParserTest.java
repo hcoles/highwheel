@@ -13,8 +13,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.classpath.ClasspathRoot;
-import org.pitest.highwheel.cycles.AccessVisitor;
 import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.ElementName;
 
@@ -34,7 +34,7 @@ public class ClassPathParserTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    this.testee = new ClassPathParser(this.cp, this.filter);
+    this.testee = new ClassPathParser(this.filter);
   }
 
   @Test
@@ -42,7 +42,7 @@ public class ClassPathParserTest {
     final ElementName foo = ElementName.fromString("foo");
     when(this.cp.classNames()).thenReturn(Collections.singleton(foo));
     when(this.filter.include(foo)).thenReturn(false);
-    testee.parse(v);
+    testee.parse(cp,v);
     verify(cp,never()).getData(foo);
   }
   
@@ -55,7 +55,7 @@ public class ClassPathParserTest {
     when(this.cp.getData(foo)).thenReturn(is);
     when(is.read()).thenThrow(new IOException());
     try {
-      this.testee.parse(this.v);
+      this.testee.parse(cp,this.v);
     } catch (final IOException ex) {
       // expected
     }

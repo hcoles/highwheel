@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.pitest.highwheel.classpath.ArchiveClassPathRoot;
+import org.pitest.highwheel.bytecodeparser.classpath.ArchiveClassPathRoot;
+import org.pitest.highwheel.bytecodeparser.classpath.DirectoryClassPathRoot;
 import org.pitest.highwheel.classpath.ClasspathRoot;
-import org.pitest.highwheel.classpath.DirectoryClassPathRoot;
 
 public class ClassPath {
 

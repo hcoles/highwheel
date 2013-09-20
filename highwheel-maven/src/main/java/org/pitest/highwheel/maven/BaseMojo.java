@@ -9,9 +9,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.pitest.highwheel.bytecodeparser.classpath.CompoundClassPathRoot;
+import org.pitest.highwheel.bytecodeparser.classpath.DirectoryClassPathRoot;
 import org.pitest.highwheel.classpath.ClasspathRoot;
-import org.pitest.highwheel.classpath.CompoundClassPathRoot;
-import org.pitest.highwheel.classpath.DirectoryClassPathRoot;
 import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.util.GlobToRegex;
@@ -21,7 +21,7 @@ import org.pitest.highwheel.util.GlobToRegex;
 
 /**
  * Base mojo for analysis mojos that require a class filter
- *  
+ * 
  */
 public abstract class BaseMojo extends AbstractMojo {
 
@@ -41,74 +41,95 @@ public abstract class BaseMojo extends AbstractMojo {
    */
   private String       classFilter;
 
-  
   /**
    * Analyse only parent (i.e pom) projects
    * 
    * @parameter default="false" expression="${parentOnly}"
    */
-  private boolean parentOnly;
-  
+  private boolean      parentOnly;
+
   /**
    * Analyse only child projects i.e do not analyse parent projects
    * 
    * @parameter default="false" expression="${childOnly}"
    */
-  private boolean childOnly;
+  private boolean      childOnly;
 
+  public final void execute() throws MojoExecutionException,
+      MojoFailureException {
 
+    final String packaging = this.project.getModel().getPackaging();
 
-  public final void execute() throws MojoExecutionException, MojoFailureException {
-
-    String packaging = this.project.getModel().getPackaging();
-    
-    if ( packaging.equalsIgnoreCase("pom") && this.childOnly ) {
+    if (packaging.equalsIgnoreCase("pom") && this.childOnly) {
       this.getLog().info("Skipping pom project");
       return;
     }
-    
-    if ( !packaging.equalsIgnoreCase("pom") && this.parentOnly ) {
+
+    if (!packaging.equalsIgnoreCase("pom") && this.parentOnly) {
       this.getLog().info("Skipping non pom project");
       return;
     }
-    
+
     final Filter filter = createClassFilter();
 
-    final List<ClasspathRoot> roots = collectRootsForChildProjects();
-    if (!packaging.equalsIgnoreCase("pom")) {
-      roots.add(makeRootForProject(this.project));
-    }
+    final ClasspathRoot mainRoot = makeRoot(packaging, mainDir());
+    final ClasspathRoot testRoot = makeRoot(packaging, testDir());
 
-    final CompoundClassPathRoot cpr = new CompoundClassPathRoot(roots);
-
-    analyse(cpr, filter);
+    analyse(mainRoot, testRoot, filter);
 
   }
 
-  private List<ClasspathRoot> collectRootsForChildProjects() {
+  private F<MavenProject, File> testDir() {
+    return new F<MavenProject, File>() {
+      public File apply(final MavenProject a) {
+        return new File(a.getBuild().getTestOutputDirectory());
+      }
+    };
+  }
+
+  private CompoundClassPathRoot makeRoot(final String packaging,
+      final F<MavenProject, File> dirFunc) {
+    final List<ClasspathRoot> roots = collectRootsForChildProjects(dirFunc);
+    if (!packaging.equalsIgnoreCase("pom")) {
+      roots.add(makeRootForProject(this.project, dirFunc));
+    }
+    return new CompoundClassPathRoot(roots);
+  }
+
+  private static F<MavenProject, File> mainDir() {
+    return new F<MavenProject, File>() {
+      public File apply(final MavenProject a) {
+        return new File(a.getBuild().getOutputDirectory());
+      }
+    };
+  }
+
+  private List<ClasspathRoot> collectRootsForChildProjects(
+      final F<MavenProject, File> dirFunc) {
     final List<ClasspathRoot> roots = new ArrayList<ClasspathRoot>();
     for (final Object each : this.project.getCollectedProjects()) {
       final MavenProject project = (MavenProject) each;
       this.getLog().info("Including child project " + project.getName());
-      roots.add(makeRootForProject(project));
+      roots.add(makeRootForProject(project, dirFunc));
     }
     return roots;
   }
 
-  private ClasspathRoot makeRootForProject(final MavenProject project) {
-    File f = new File(project.getBuild()
-        .getOutputDirectory());
-    if ( !f.exists() || !f.isDirectory() ) {
+  private ClasspathRoot makeRootForProject(final MavenProject project,
+      final F<MavenProject, File> dirFunc) {
+    final File f = dirFunc.apply(project);
+    if (!f.exists() || !f.isDirectory()) {
       this.getLog().warn("Cannot read from " + f.getAbsolutePath());
     }
-    this.getLog().info("Including dir " + project.getBuild()
-        .getOutputDirectory());
+    this.getLog().info(
+        "Including dir " + project.getBuild().getOutputDirectory());
     return new DirectoryClassPathRoot(new File(project.getBuild()
         .getOutputDirectory()));
   }
 
-  protected abstract void analyse(final ClasspathRoot cpr, final Filter filter) throws MojoExecutionException;
-
+  protected abstract void analyse(final ClasspathRoot mainRoot,
+      final ClasspathRoot testRoot, final Filter filter)
+      throws MojoExecutionException;
 
   private Filter createClassFilter() {
     if (this.classFilter == null) {
@@ -127,12 +148,11 @@ public abstract class BaseMojo extends AbstractMojo {
     };
   }
 
-  protected File makeReportDirectory(String dirName) {
+  protected File makeReportDirectory(final String dirName) {
     final File dir = new File(this.project.getBuild().getDirectory()
         + File.separator + dirName);
     dir.mkdirs();
     return dir;
   }
-
 
 }

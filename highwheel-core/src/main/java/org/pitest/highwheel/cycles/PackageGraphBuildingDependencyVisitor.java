@@ -1,6 +1,7 @@
 package org.pitest.highwheel.cycles;
 
 
+import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.model.AccessPoint;
 import org.pitest.highwheel.model.AccessType;
 import org.pitest.highwheel.model.Dependency;

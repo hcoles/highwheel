@@ -1,4 +1,4 @@
-package org.pitest.highwheel.classpath;
+package org.pitest.highwheel.bytecodeparser.classpath;
 
 /*
  * Copyright 2010 Henry Coles
@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.model.ElementName;
 
 public class ClassLoaderClassPathRoot implements ClasspathRoot {

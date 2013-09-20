@@ -1,4 +1,4 @@
-package org.pitest.highwheel.classpath;
+package org.pitest.highwheel.bytecodeparser.classpath;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.model.ElementName;
 
 public class DirectoryClassPathRoot implements ClasspathRoot {

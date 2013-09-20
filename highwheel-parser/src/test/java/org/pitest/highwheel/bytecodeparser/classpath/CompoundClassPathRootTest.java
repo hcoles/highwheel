@@ -1,4 +1,4 @@
-package org.pitest.highwheel.classpath;
+package org.pitest.highwheel.bytecodeparser.classpath;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.pitest.highwheel.bytecodeparser.classpath.CompoundClassPathRoot;
+import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.model.ElementName;
 
 public class CompoundClassPathRootTest {

@@ -7,7 +7,7 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.pitest.highwheel.cycles.AccessVisitor;
+import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.model.AccessPoint;
 import org.pitest.highwheel.model.AccessType;
 import org.pitest.highwheel.model.ElementName;

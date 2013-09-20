@@ -13,9 +13,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.pitest.highwheel.classpath.ClassLoaderClassPathRoot;
+import org.pitest.highwheel.bytecodeparser.classpath.ClassLoaderClassPathRoot;
+import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.classpath.ClasspathRoot;
-import org.pitest.highwheel.cycles.AccessVisitor;
 import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.AccessPoint;
 import org.pitest.highwheel.model.AccessType;
@@ -292,18 +292,17 @@ public class ClassPathParserSystemTest {
 
   private void parseClassPath(final Class<?>... classes) {
     try {
-      this.testee = createToSee(classes);
-      this.testee.parse(this.v);
+      this.testee = makeToSeeOnlyExampleDotCom();
+      this.testee.parse(createRootFor(classes),this.v);
     } catch (final IOException ex) {
       throw new RuntimeException(ex);
     }
   }
-
-  private ClassPathParser createToSee(final Class<?>... classes) {
-    final ClasspathRoot cp = createRootFor(classes);
-    final Filter filter = matchOnlyExampleDotCom();
-    return new ClassPathParser(cp, filter);
+  
+  private ClassPathParser makeToSeeOnlyExampleDotCom() {
+	  return new ClassPathParser(matchOnlyExampleDotCom());
   }
+
 
   private ClasspathRoot createRootFor(final Class<?>[] classes) {
     final Collection<ElementName> elements = new ArrayList<ElementName>();
