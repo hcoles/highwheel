@@ -35,6 +35,7 @@ public class BaseHtmlWriter {
   protected final void writeFooter(final String stream) {
     write(stream, "</article>");
     write(stream, "</body>");
+    write(stream, "</html>");
   }
 
   protected final void write(final String stream, final String value) {

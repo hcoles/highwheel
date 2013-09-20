@@ -17,12 +17,8 @@ public class IndexWriter extends BaseWriter {
     super(streams);
   }
 
-  public void start(final DirectedGraph<ElementName, Dependency> classes,
-      final DirectedGraph<ElementName, Dependency> packages) {
-    writeHeader(INDEX);
-  }
-
   public void start(final CodeStats stats) {
+    writeHeader(INDEX);
     writeIndex("<header>");
     writeIndex("<h1>Highwheel report</h1>");
     writeIndex("</header>");
@@ -90,5 +86,6 @@ public class IndexWriter extends BaseWriter {
     writeIndex("<section><h1>Packages cycles</h1><ul>");
 
   }
+
 
 }
