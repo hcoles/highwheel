@@ -15,7 +15,7 @@ smaller elemental sub-cycles for easier comprehension.
 Cycles are detected using [tarjen's algorithm](http://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm).
 
 As fixing package cycles often involves moving classes between packages highwheel also reports unit tests that look to have been
-left the wrong package when their testee is moved (*for maven only in latest snapshot*).
+left the wrong package when their testee is moved ( *for maven only in latest snapshot* ).
 
 # Documentation
 
