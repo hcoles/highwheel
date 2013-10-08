@@ -11,6 +11,7 @@ import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 import org.pitest.highwheel.Highwheel;
 import org.pitest.highwheel.bytecodeparser.ClassPathParser;
+import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.oracle.DependencyOracle;
@@ -27,6 +28,7 @@ public class AnalyseTask extends Task {
 
   private Filter              filter;
   private Path                analysisPath;
+  private Path testPath;
   private String              accessRules;
   private File                outputDir;
 
@@ -66,11 +68,18 @@ public class AnalyseTask extends Task {
     final FileStreamFactory fos = this.streams.get(pickOutputDir());
     try {
       final Highwheel a = new Highwheel(parser, makePackageOracle(), fos);
-      a.analyse(this.parser.parse(this.analysisPath), null);
+      a.analyse(this.parser.parse(this.analysisPath), makeTestRoot());
     } finally {
       fos.close();
     }
 
+  }
+
+  private ClasspathRoot makeTestRoot() {
+    if ( this.testPath != null ) {
+      return this.parser.parse(this.testPath);
+    }
+    return null;
   }
 
   private File pickOutputDir() {
@@ -117,6 +126,30 @@ public class AnalyseTask extends Task {
     path.toString(); // throws on error
   }
 
+  
+  public void setTestPath(final Path src) {
+    if (isNonEmpty(src)) {
+      if (this.testPath == null) {
+        this.testPath = src;
+      } else {
+        this.testPath.append(src);
+      }
+    }
+  }
+
+  public Path createTestPath() {
+    if (this.testPath == null) {
+      this.testPath = new Path(getProject());
+    }
+    return this.testPath.createPath();
+  }
+
+  public void setTestPathRef(final Reference r) {
+    final Path path = createTestPath();
+    path.setRefid(r);
+    path.toString(); // throws on error
+  }
+  
   private boolean isNonEmpty(final Path src) {
     for (final String anElementList : src.list()) {
       if (!anElementList.equals("")) {
