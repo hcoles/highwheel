@@ -14,9 +14,15 @@ import org.pitest.highwheel.model.ElementName;
 public class ClassPathParser implements ClassParser {
 
   private final Filter        filter;
-
+  private final NameTransformer nameTransformer;
+  
   public ClassPathParser(final Filter filter) {
+    this(filter, new CollapseInnerClassesNameTransformer());
+  }
+
+  public ClassPathParser(final Filter filter, final NameTransformer nameTransformer) {
     this.filter = filter;
+    this.nameTransformer = nameTransformer;
   }
 
   public void parse(final ClasspathRoot classes, final AccessVisitor v) throws IOException {
@@ -35,7 +41,7 @@ public class ClassPathParser implements ClassParser {
     try {
       final ClassReader reader = new ClassReader(is);
       final DependencyClassVisitor cv = new DependencyClassVisitor(null,
-          new FilteringDecorator(dv, this.filter));
+          new FilteringDecorator(dv, this.filter), nameTransformer);
       reader.accept(cv, 0);
     } finally {
       is.close();

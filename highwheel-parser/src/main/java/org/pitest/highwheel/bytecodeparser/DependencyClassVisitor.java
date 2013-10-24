@@ -1,7 +1,6 @@
 package org.pitest.highwheel.bytecodeparser;
 
 import static org.pitest.highwheel.bytecodeparser.NameUtil.getElementNameForType;
-import static org.pitest.highwheel.bytecodeparser.NameUtil.getOutermostClassName;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
@@ -20,12 +19,14 @@ class DependencyClassVisitor extends ClassVisitor {
   private final static ElementName OBJECT = ElementName.fromClass(Object.class);
 
   private final AccessVisitor      dependencyVisitor;
+  private final NameTransformer nameTransformer;
   private AccessPoint              parent;
 
   public DependencyClassVisitor(final ClassVisitor visitor,
-      final AccessVisitor typeReceiver) {
+      final AccessVisitor typeReceiver, NameTransformer nameTransformer) {
     super(Opcodes.ASM4, visitor);
     this.dependencyVisitor = filterOutJavaLangObject(typeReceiver);
+    this.nameTransformer = nameTransformer;
   }
 
   private static AccessVisitor filterOutJavaLangObject(final AccessVisitor child) {
@@ -55,17 +56,17 @@ class DependencyClassVisitor extends ClassVisitor {
   @Override
   public void visit(final int version, final int access, final String name,
       final String signature, final String superName, final String[] interfaces) {
-    this.parent = AccessPoint.create(getOutermostClassName(name));
+    this.parent = AccessPoint.create(nameTransformer.transform(name));
     this.dependencyVisitor.newNode(this.parent.getElementName());
 
     if (superName != null) {
       this.dependencyVisitor.apply(this.parent,
-          AccessPoint.create(getOutermostClassName(superName)),
+          AccessPoint.create(nameTransformer.transform(superName)),
           AccessType.INHERITANCE);
     }
     for (final String each : interfaces) {
       this.dependencyVisitor.apply(this.parent,
-          AccessPoint.create(getOutermostClassName(each)), AccessType.IMPLEMENTS);
+          AccessPoint.create(nameTransformer.transform(each)), AccessType.IMPLEMENTS);
     }
 
     if (signature != null) {
@@ -105,7 +106,7 @@ class DependencyClassVisitor extends ClassVisitor {
   public void visitOuterClass(final String owner, final String name,
       final String desc) {
 
-    final ElementName outer = getOutermostClassName(owner);
+    final ElementName outer = nameTransformer.transform(owner);
     if (name != null) {
       this.parent = AccessPoint.create(outer, name);
     } else {
@@ -133,7 +134,7 @@ class DependencyClassVisitor extends ClassVisitor {
           this.dependencyVisitor, AccessType.SIGNATURE));
     }
 
-    return new DependencyMethodVisitor(method, this.dependencyVisitor);
+    return new DependencyMethodVisitor(method, this.dependencyVisitor, nameTransformer);
   }
 
   private boolean isEntryPoint(int access, String name, String desc) {
@@ -148,7 +149,7 @@ class DependencyClassVisitor extends ClassVisitor {
     final org.objectweb.asm.Type returnType = org.objectweb.asm.Type
         .getMethodType(desc).getReturnType();
     this.dependencyVisitor.apply(method, AccessPoint
-        .create(getOutermostClassName(getElementNameForType(returnType)
+        .create(nameTransformer.transform(getElementNameForType(returnType)
             .asInternalName())), AccessType.SIGNATURE);
   }
 
@@ -157,7 +158,7 @@ class DependencyClassVisitor extends ClassVisitor {
     if (exceptions != null) {
       for (final String each : exceptions) {
         this.dependencyVisitor.apply(method,
-            AccessPoint.create(getOutermostClassName(each)), AccessType.SIGNATURE);
+            AccessPoint.create(nameTransformer.transform(each)), AccessType.SIGNATURE);
       }
     }
   }
@@ -168,7 +169,7 @@ class DependencyClassVisitor extends ClassVisitor {
 
     for (final Type each : params) {
       this.dependencyVisitor.apply(method,
-          AccessPoint.create(getOutermostClassName(getElementNameForType(each)
+          AccessPoint.create(nameTransformer.transform(getElementNameForType(each)
               .asInternalName())), AccessType.SIGNATURE);
     }
   }

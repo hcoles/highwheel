@@ -1,7 +1,6 @@
 package org.pitest.highwheel.bytecodeparser;
 
 import static org.pitest.highwheel.bytecodeparser.NameUtil.getElementNameForType;
-import static org.pitest.highwheel.bytecodeparser.NameUtil.getOutermostClassName;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -16,12 +15,14 @@ class DependencyMethodVisitor extends MethodVisitor {
 
   private final AccessPoint   parent;
   private final AccessVisitor typeReceiver;
+  private final NameTransformer nameTransformer;
 
   public DependencyMethodVisitor(final AccessPoint owner,
-      final AccessVisitor typeReceiver) {
+      final AccessVisitor typeReceiver, NameTransformer nameTransformer) {
     super(Opcodes.ASM4, null);
     this.typeReceiver = typeReceiver;
     this.parent = owner;
+    this.nameTransformer = nameTransformer;
   }
 
   @Override
@@ -29,7 +30,7 @@ class DependencyMethodVisitor extends MethodVisitor {
       final String name, final String desc) {
     this.typeReceiver
         .apply(this.parent, AccessPoint.create(
-            getOutermostClassName(owner), name),
+            nameTransformer.transform(owner), name),
             AccessType.USES);
   }
 
@@ -38,7 +39,7 @@ class DependencyMethodVisitor extends MethodVisitor {
       final String name, final String desc) {
     this.typeReceiver
         .apply(this.parent, AccessPoint.create(
-            getOutermostClassName(owner), name),
+            nameTransformer.transform(owner), name),
             AccessType.USES);
   }
 
