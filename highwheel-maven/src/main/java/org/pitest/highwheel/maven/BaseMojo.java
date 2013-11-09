@@ -37,7 +37,7 @@ public abstract class BaseMojo extends AbstractMojo {
   /**
    * Classes to include in analyse. Glob syntax
    * 
-   * @parameter
+   * @parameter default="" expression="${classFilter}"
    */
   private String       classFilter;
 
@@ -131,7 +131,7 @@ public abstract class BaseMojo extends AbstractMojo {
       throws MojoExecutionException;
 
   private Filter createClassFilter() {
-    if (this.classFilter == null) {
+    if (this.classFilter == null || this.classFilter.isEmpty() ) {
       return makeFilter(this.project.getGroupId() + ".*");
     }
     return makeFilter(this.classFilter);

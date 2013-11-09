@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.classpath.ClassParser;
 import org.pitest.highwheel.classpath.ClasspathRoot;
-import org.pitest.highwheel.cycles.ClassGraphBuildingDependencyVisitor;
+import org.pitest.highwheel.cycles.ClassDependencyGraphBuildingVisitor;
 import org.pitest.highwheel.cycles.CodeGraphs;
 import org.pitest.highwheel.cycles.CycleAnalyser;
 import org.pitest.highwheel.cycles.CycleReporter;
@@ -39,7 +39,7 @@ public class Highwheel {
 
     final DirectedGraph<ElementName, Dependency> classGraph = new DirectedSparseGraph<ElementName, Dependency>();
 
-    final AccessVisitor v = new ClassGraphBuildingDependencyVisitor(classGraph);
+    final AccessVisitor v = new ClassDependencyGraphBuildingVisitor(classGraph);
 
     this.parser.parse(mainRoot, v);
 
