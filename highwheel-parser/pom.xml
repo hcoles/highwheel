@@ -41,10 +41,9 @@
 			<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
-				<version>0.32-SNAPSHOT</version>
+				<version>0.31</version>
 				<configuration>
 					<timestampedReports>false</timestampedReports>
-					<coverageThreshold>100</coverageThreshold>
 					<targetClasses>
 						<param>org.pitest.highwheel*</param>
 					</targetClasses>
