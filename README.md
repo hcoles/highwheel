@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/hcoles/pitest.png?branch=master)](https://travis-ci.org/hcoles/highwheel.svg)
+
 # Highwheel
 
 Highwheel is a tool to detect and visualise class and package cycles in Java code.
