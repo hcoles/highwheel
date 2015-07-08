@@ -8,7 +8,15 @@
 	</parent>
 	<artifactId>highwheel-core</artifactId>
 	<packaging>jar</packaging>
-	<dependencies>
+    <build>
+      <resources>
+        <resource>
+          <directory>src/main/resources</directory>
+          <filtering>true</filtering>
+        </resource>
+      </resources>
+    </build>
+    <dependencies>
 		<dependency>
 			<groupId>org.pitest</groupId>
 			<artifactId>highwheel-model</artifactId>
