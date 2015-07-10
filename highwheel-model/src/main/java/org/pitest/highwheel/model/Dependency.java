@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class Dependency {
+public final class Dependency {
 
   private final List<Access> consituents = new ArrayList<Access>(3);
 
@@ -23,15 +23,15 @@ public class Dependency {
     }
     return s;
   }
-
-  @Override
-  public String toString() {
-    return "" + this.consituents;
-  }
-
+  
   public void addDependency(final AccessPoint source, final AccessPoint dest,
       final AccessType type) {
     this.consituents.add(Access.create(source, dest, type));
+  }
+ 
+  @Override
+  public String toString() {
+    return "" + this.consituents;
   }
 
 }

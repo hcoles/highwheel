@@ -11,6 +11,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureReader;
 import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.model.AccessPoint;
+import org.pitest.highwheel.model.AccessPointName;
 import org.pitest.highwheel.model.AccessType;
 import org.pitest.highwheel.model.ElementName;
 
@@ -108,7 +109,7 @@ class DependencyClassVisitor extends ClassVisitor {
 
     final ElementName outer = nameTransformer.transform(owner);
     if (name != null) {
-      this.parent = AccessPoint.create(outer, name);
+      this.parent = AccessPoint.create(outer, AccessPointName.create(name, desc));
     } else {
       this.parent = AccessPoint.create(outer);
     }
@@ -118,7 +119,7 @@ class DependencyClassVisitor extends ClassVisitor {
   public MethodVisitor visitMethod(final int access, final String name,
       final String desc, final String signature, final String[] exceptions) {
 
-    final AccessPoint method = pickAccessPointForMethod(name);
+    final AccessPoint method = pickAccessPointForMethod(name, desc);
 
     examineParameters(desc, method);
     examineExceptions(exceptions, method);
@@ -174,11 +175,11 @@ class DependencyClassVisitor extends ClassVisitor {
     }
   }
 
-  private AccessPoint pickAccessPointForMethod(final String name) {
+  private AccessPoint pickAccessPointForMethod(final String name, final String desc) {
     if (parentIsMethod()) {
       return this.parent;
     }
-    return this.parent.methodAccess(name);
+    return this.parent.methodAccess(AccessPointName.create(name, desc));
   }
 
   private boolean parentIsMethod() {

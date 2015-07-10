@@ -43,9 +43,6 @@ public class Highwheel {
 
     this.parser.parse(mainRoot, v);
 
-    // this.getLog().info("Scanned " + classGraph.getVertexCount() +
-    // " classes");
-
     final CodeGraphs g = new CodeGraphs(classGraph);
     final CycleAnalyser cycleAnalyser = new CycleAnalyser();
     final CycleReporter r = new HtmlCycleWriter(this.dependencyOracle, this.fsf);

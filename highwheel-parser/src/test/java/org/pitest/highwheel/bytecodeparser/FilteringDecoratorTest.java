@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.AccessPoint;
+import org.pitest.highwheel.model.AccessPointName;
 import org.pitest.highwheel.model.AccessType;
 import org.pitest.highwheel.model.ElementName;
 
@@ -28,10 +29,10 @@ public class FilteringDecoratorTest {
   private final ElementName  barElement = ElementName.fromString("bar");
 
   private final AccessPoint  foo        =  AccessPoint.create(this.fooElement,
-                                            "foo");
+      AccessPointName.create("foo", "()V"));
 
   private final AccessPoint  bar        =  AccessPoint.create(this.barElement,
-                                            "bar");
+      AccessPointName.create("bar", "()V"));
 
   @Before
   public void setUp() {

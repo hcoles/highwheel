@@ -3,32 +3,31 @@ package org.pitest.highwheel.model;
 public final class AccessPoint {
 
   private final ElementName clazz;
-  private final String      attribute;
+  private final AccessPointName      attribute;
 
-  AccessPoint(final ElementName clazz, final String attribute) {
+  AccessPoint(final ElementName clazz, final AccessPointName attribute) {
     this.clazz = clazz;
     this.attribute = attribute;
   }
 
   public static AccessPoint create(final ElementName clazz,
-      final String attribute) {
-    return new AccessPoint(clazz, attribute.replace('<', '(').replace('>', ')')
-        .intern());
+      final AccessPointName attribute) {
+    return new AccessPoint(clazz, attribute);
   }
 
   public static AccessPoint create(final ElementName clazz) {
     return new AccessPoint(clazz, null);
   }
 
-  public AccessPoint methodAccess(final String name) {
-    return create(this.clazz, name);
+  public AccessPoint methodAccess(AccessPointName method) {
+    return create(this.clazz, method);
   }
 
   public ElementName getElementName() {
     return this.clazz;
   }
 
-  public String getAttribute() {
+  public AccessPointName getAttribute() {
     return this.attribute;
   }
 
@@ -36,39 +35,30 @@ public final class AccessPoint {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = (prime * result)
-        + ((this.attribute == null) ? 0 : this.attribute.hashCode());
-    result = (prime * result)
-        + ((this.clazz == null) ? 0 : this.clazz.hashCode());
+    result = prime * result + ((attribute == null) ? 0 : attribute.hashCode());
+    result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
     return result;
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
+  public boolean equals(Object obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (obj == null)
       return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (getClass() != obj.getClass())
       return false;
-    }
-    final AccessPoint other = (AccessPoint) obj;
-    if (this.attribute == null) {
-      if (other.attribute != null) {
+    AccessPoint other = (AccessPoint) obj;
+    if (attribute == null) {
+      if (other.attribute != null)
         return false;
-      }
-    } else if (!this.attribute.equals(other.attribute)) {
+    } else if (!attribute.equals(other.attribute))
       return false;
-    }
-    if (this.clazz == null) {
-      if (other.clazz != null) {
+    if (clazz == null) {
+      if (other.clazz != null)
         return false;
-      }
-    } else if (!this.clazz.equals(other.clazz)) {
+    } else if (!clazz.equals(other.clazz))
       return false;
-    }
     return true;
   }
 

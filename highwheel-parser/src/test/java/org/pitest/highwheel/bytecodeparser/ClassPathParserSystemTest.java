@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.objectweb.asm.Type;
 import org.pitest.highwheel.bytecodeparser.classpath.ClassLoaderClassPathRoot;
 import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.classpath.ClasspathRoot;
@@ -20,6 +21,7 @@ import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.AccessPoint;
 import org.pitest.highwheel.model.AccessType;
 import org.pitest.highwheel.model.ElementName;
+import org.pitest.highwheel.model.AccessPointName;
 
 import com.example.AnException;
 import com.example.AnInterface;
@@ -97,50 +99,51 @@ public class ClassPathParserSystemTest {
   @Test
   public void shouldDetectSignatureDependencyWhenMethodReturnsAType() {
     parseClassPath(ReturnsAFoo.class, Foo.class);
-    verify(this.v).apply(access(ReturnsAFoo.class, "foo"),
+    verify(this.v).apply(access(ReturnsAFoo.class, method("foo", Foo.class)),
         accessAType(Foo.class), AccessType.SIGNATURE);
   }
+
 
   @Test
   public void shouldDetectACompositionDependencyWhenClassReturnsAnArray() {
     parseClassPath(ReturnsArrayOfFoo.class, Foo.class);
-    verify(this.v).apply(access(ReturnsArrayOfFoo.class,"foo"),
+    verify(this.v).apply(access(ReturnsArrayOfFoo.class, method("foo", Foo[].class)),
         accessAType(Foo.class), AccessType.SIGNATURE);
   }
   
   @Test
   public void shouldDetectSignatureDependencyWhenMethodHasParameterOfType() {
     parseClassPath(HasFooAsParameter.class, Foo.class);
-    verify(this.v).apply(access(HasFooAsParameter.class, "foo"),
+    verify(this.v).apply(access(HasFooAsParameter.class, methodWithParameter("foo", Foo.class)),
         accessAType(Foo.class), AccessType.SIGNATURE);
   }
   
   @Test
   public void shouldDetectSignatureDependencyWhenMethodHasArrayParameter() {
     parseClassPath(HasFooArrayAsParameter.class, Foo.class);
-    verify(this.v).apply(access(HasFooArrayAsParameter.class, "foo"),
+    verify(this.v).apply(access(HasFooArrayAsParameter.class, methodWithParameter("foo", Foo[].class)),
         accessAType(Foo.class), AccessType.SIGNATURE);
   }
   
   @Test
   public void shouldDetectASignatureDependencyWhenDeclaresAnException() {
     parseClassPath(DeclaresAnException.class, AnException.class);
-    verify(this.v).apply(access(DeclaresAnException.class, "foo"),
+    verify(this.v).apply(access(DeclaresAnException.class, method("foo", "()V")),
         accessAType(AnException.class), AccessType.SIGNATURE);
   }
 
   @Test
   public void shouldDetectUsesDependencyWhenConstructsAType() {
     parseClassPath(ConstructsAFoo.class, Foo.class);
-    verify(this.v).apply(access(ConstructsAFoo.class, "foo"),
-        access(Foo.class, "<init>"), AccessType.USES);
+    verify(this.v).apply(access(ConstructsAFoo.class, method("foo",Object.class)),
+        access(Foo.class, method("<init>","()V")), AccessType.USES);
   }
 
   @Test
   public void shouldDetectUsesDependencyWhenCallsMethodOnType() {
     parseClassPath(CallsFooMethod.class, Foo.class);
-    verify(this.v).apply(access(CallsFooMethod.class, "foo"),
-        access(Foo.class, "aMethod"), AccessType.USES);
+    verify(this.v).apply(access(CallsFooMethod.class, method("foo",Object.class)),
+        access(Foo.class, method("aMethod",Object.class)), AccessType.USES);
   }
 
   @Test
@@ -153,14 +156,14 @@ public class ClassPathParserSystemTest {
   @Test
   public void shouldDetectWhenAnnotatedAtMethodLevel() {
     parseClassPath(AnnotatedAtMethodLevel.class, AnAnnotation.class);
-    verify(this.v).apply(access(AnnotatedAtMethodLevel.class,"foo"),
+    verify(this.v).apply(access(AnnotatedAtMethodLevel.class, method("foo","()V")),
         accessAType(AnAnnotation.class), AccessType.ANNOTATED);
   }
 
   @Test
   public void shouldDetectWhenAnnotatedAtParameterLevel() {
     parseClassPath(AnnotatedAtParameterLevel.class, AnAnnotation.class);
-    verify(this.v).apply(access(AnnotatedAtParameterLevel.class, "foo"),
+    verify(this.v).apply(access(AnnotatedAtParameterLevel.class, method("foo","(I)V")),
         accessAType(AnAnnotation.class), AccessType.ANNOTATED);
   }
 
@@ -182,23 +185,23 @@ public class ClassPathParserSystemTest {
   public void shouldDetectAUsesRelationshipForParentClassMethodWhenNestedClassCallsMethod() {
     parseClassPath(CallsMethodFromFooWithinInnerClass.class, Foo.class);
     verify(this.v).apply(
-        access(CallsMethodFromFooWithinInnerClass.class, "foo"),
-        access(Foo.class, "aMethod"), AccessType.USES);
+        access(CallsMethodFromFooWithinInnerClass.class, method("foo","()V")),
+        access(Foo.class, method("aMethod",Object.class)), AccessType.USES);
   }
   
   @Test
   public void shouldDetectAUsesRealtionshipWhenWritesToClassField() {
     parseClassPath(UsesFieldOnFoo.class, Foo.class);
     verify(this.v).apply(
-        access(UsesFieldOnFoo.class, "foo"),
-        access(Foo.class, "aField"), AccessType.USES);
+        access(UsesFieldOnFoo.class, method("foo","()V")),
+        access(Foo.class, method("aField","I")), AccessType.USES);
   }
   
   @Test
   public void shouldDetectAUsesRealtionshipWhenStoresClassLiteralAsField() {
     parseClassPath(StoresFooClassLiteralAsField.class, Foo.class);
     verify(this.v).apply(
-        access(StoresFooClassLiteralAsField.class, "<init>"),
+        access(StoresFooClassLiteralAsField.class, method("<init>","()V")),
         accessAType(Foo.class), AccessType.USES);
   }
   
@@ -206,7 +209,7 @@ public class ClassPathParserSystemTest {
   public void shouldDetectAUsesRealtionshipWhenStoresClassArrayLiteralAsField() {
     parseClassPath(StoresFooArrayClassLiteralAsField.class, Foo.class);
     verify(this.v).apply(
-        access(StoresFooArrayClassLiteralAsField.class,"<init>"),
+        access(StoresFooArrayClassLiteralAsField.class, method("<init>","()V")),
         accessAType(Foo.class), AccessType.USES);
   }
   
@@ -214,7 +217,7 @@ public class ClassPathParserSystemTest {
   public void shouldDetectAUsesRelationshipWhenUsesFooClassLiteralInMethod() {
     parseClassPath(MethodAccessFooClassLiteral.class, Foo.class);
     verify(this.v).apply(
-        access(MethodAccessFooClassLiteral.class,"foo"),
+        access(MethodAccessFooClassLiteral.class, method("foo",Class.class)),
         accessAType(Foo.class), AccessType.USES);
   }
   
@@ -353,8 +356,21 @@ public class ClassPathParserSystemTest {
     return AccessPoint.create(ElementName.fromClass(type));
   }
 
-  private AccessPoint access(final Class<?> type, final String method) {
+  
+  private AccessPoint access(final Class<?> type, final AccessPointName method) {
     return AccessPoint.create(ElementName.fromClass(type), method);
   }
 
+  private AccessPointName methodWithParameter(String name, Class<?> paramType) {
+    return AccessPointName.create(name, Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(paramType)));
+  }
+  
+  private AccessPointName method(String name, String desc) {
+    return AccessPointName.create(name, desc);
+  }
+  
+  private AccessPointName method(String name, Class<?> retType) {
+    return AccessPointName.create(name, Type.getMethodDescriptor(Type.getType(retType)));
+  }
+  
 }

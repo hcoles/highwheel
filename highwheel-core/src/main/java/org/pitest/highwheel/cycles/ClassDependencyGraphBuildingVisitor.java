@@ -42,7 +42,6 @@ public class ClassDependencyGraphBuildingVisitor implements AccessVisitor {
 
   public void newNode(final ElementName clazz) {
     this.g.addVertex(clazz);
-
   }
 
   public void newEntryPoint(final ElementName clazz) {

@@ -8,9 +8,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 import org.junit.Test;
 
 public class ElementNameTest {
+  
+  @Test
+  public void shouldObeyHashcodeEqualsContract() {
+    EqualsVerifier.forClass(ElementName.class).verify();
+  }
 
   @Test
   public void shouldConvertJavaNamesToInternalNames() {

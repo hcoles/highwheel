@@ -28,7 +28,7 @@ public class HighWheelIT {
   private final static Logger LOG = Logger.getAnonymousLogger();
 
   @Rule
-  public TemporaryFolder testFolder = new TemporaryFolderWithOptions();
+  public TemporaryFolder testFolder = new TemporaryFolderWithOptions(false);
 
   private Verifier       verifier;
  

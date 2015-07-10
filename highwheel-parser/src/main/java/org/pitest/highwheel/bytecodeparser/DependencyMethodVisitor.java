@@ -8,6 +8,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.model.AccessPoint;
+import org.pitest.highwheel.model.AccessPointName;
 import org.pitest.highwheel.model.AccessType;
 import org.pitest.highwheel.model.ElementName;
 
@@ -30,7 +31,7 @@ class DependencyMethodVisitor extends MethodVisitor {
       final String name, final String desc) {
     this.typeReceiver
         .apply(this.parent, AccessPoint.create(
-            nameTransformer.transform(owner), name),
+            nameTransformer.transform(owner), AccessPointName.create(name, desc)),
             AccessType.USES);
   }
 
@@ -39,7 +40,7 @@ class DependencyMethodVisitor extends MethodVisitor {
       final String name, final String desc) {
     this.typeReceiver
         .apply(this.parent, AccessPoint.create(
-            nameTransformer.transform(owner), name),
+            nameTransformer.transform(owner), AccessPointName.create(name, desc)),
             AccessType.USES);
   }
 
