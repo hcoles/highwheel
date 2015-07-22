@@ -44,7 +44,6 @@ class DependencyClassVisitor extends ClassVisitor {
 
       public void newNode(final ElementName clazz) {
         child.newNode(clazz);
-
       }
 
       public void newEntryPoint(ElementName clazz) {
