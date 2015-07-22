@@ -35,8 +35,7 @@ class DependencyClassVisitor extends ClassVisitor {
 
       public void apply(final AccessPoint source, final AccessPoint dest,
           final AccessType type) {
-        if (!dest.getElementName().equals(OBJECT)
-            && !source.getElementName().equals(dest.getElementName())) {
+        if (!dest.getElementName().equals(OBJECT)) {
           child.apply(source, dest, type);
         }
 

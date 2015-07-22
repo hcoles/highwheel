@@ -1,5 +1,6 @@
 package org.pitest.highwheel.model;
 
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.junit.Test;
