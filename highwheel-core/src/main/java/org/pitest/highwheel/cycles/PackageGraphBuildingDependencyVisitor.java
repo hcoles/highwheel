@@ -18,6 +18,7 @@ class PackageGraphBuildingDependencyVisitor implements AccessVisitor {
     this.g = g;
   }
 
+  @Override
   public void apply(final AccessPoint source, final AccessPoint dest,
       final AccessType type) {
     final ElementName sourcePackage = source.getElementName().getParent();
@@ -34,14 +35,20 @@ class PackageGraphBuildingDependencyVisitor implements AccessVisitor {
 
   }
 
+  @Override
   public void newNode(final ElementName clazz) {
     this.g.addVertex(clazz.getParent());
 
   }
 
+  @Override
   public void newEntryPoint(final ElementName clazz) {
-    // TODO Auto-generated method stub
 
+  }
+
+  @Override
+  public void newAccessPoint(AccessPoint ap) {
+    
   }
 
 }

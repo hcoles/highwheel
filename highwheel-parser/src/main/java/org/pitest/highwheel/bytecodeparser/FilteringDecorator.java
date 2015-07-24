@@ -20,6 +20,7 @@ class FilteringDecorator implements AccessVisitor {
     this.filter = filter;
   }
 
+  @Override
   public void apply(final AccessPoint source, final AccessPoint dest,
       final AccessType type) {
     if (this.filter.include(dest.getElementName()) && this.filter.include(source.getElementName())) {
@@ -27,16 +28,23 @@ class FilteringDecorator implements AccessVisitor {
     }
   }
 
+  @Override
   public void newNode(final ElementName clazz) {
     if (this.filter.include(clazz)) {
       this.child.newNode(clazz);
     }
   }
 
+  @Override
   public void newEntryPoint(ElementName clazz) {
     if (this.filter.include(clazz)) {
       this.child.newEntryPoint(clazz);
     }
+  }
+
+  @Override
+  public void newAccessPoint(AccessPoint ap) {
+    this.child.newAccessPoint(ap);
   }
 
 }

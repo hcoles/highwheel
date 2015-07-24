@@ -19,9 +19,9 @@ import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.cycles.Filter;
 import org.pitest.highwheel.model.AccessPoint;
+import org.pitest.highwheel.model.AccessPointName;
 import org.pitest.highwheel.model.AccessType;
 import org.pitest.highwheel.model.ElementName;
-import org.pitest.highwheel.model.AccessPointName;
 
 import com.example.AnException;
 import com.example.AnInterface;
@@ -269,6 +269,12 @@ public class ClassPathParserSystemTest {
   public void shouldDetectUnConnectedClasses() {
     parseClassPath(Unconnected.class);
     verify(this.v).newNode(ElementName.fromClass(Unconnected.class));
+  }
+  
+  @Test
+  public void shouldDetectUnConnectedMethods() {
+    parseClassPath(Foo.class);
+    verify(this.v).newAccessPoint(access(Foo.class, method("aMethod", "()Ljava/lang/Object;") ));
   }
   
   @Test

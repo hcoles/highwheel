@@ -43,8 +43,14 @@ public class ClassDependencyGraphBuildingVisitor implements AccessVisitor {
     this.g.addVertex(clazz);
   }
 
+  @Override
   public void newEntryPoint(final ElementName clazz) {
 
+  }
+
+  @Override
+  public void newAccessPoint(AccessPoint ap) {
+    
   }
 
 }

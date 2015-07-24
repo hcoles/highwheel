@@ -33,6 +33,7 @@ class DependencyClassVisitor extends ClassVisitor {
   private static AccessVisitor filterOutJavaLangObject(final AccessVisitor child) {
     return new AccessVisitor() {
 
+      @Override
       public void apply(final AccessPoint source, final AccessPoint dest,
           final AccessType type) {
         if (!dest.getElementName().equals(OBJECT)) {
@@ -41,12 +42,19 @@ class DependencyClassVisitor extends ClassVisitor {
 
       }
 
+      @Override
       public void newNode(final ElementName clazz) {
         child.newNode(clazz);
       }
 
+      @Override
       public void newEntryPoint(ElementName clazz) {
         child.newEntryPoint(clazz);        
+      }
+
+      @Override
+      public void newAccessPoint(AccessPoint ap) {
+        child.newAccessPoint(ap); 
       }
 
     };
@@ -118,6 +126,8 @@ class DependencyClassVisitor extends ClassVisitor {
       final String desc, final String signature, final String[] exceptions) {
 
     final AccessPoint method = pickAccessPointForMethod(name, desc);
+    
+    this.dependencyVisitor.newAccessPoint(method);
 
     examineParameters(desc, method);
     examineExceptions(exceptions, method);
