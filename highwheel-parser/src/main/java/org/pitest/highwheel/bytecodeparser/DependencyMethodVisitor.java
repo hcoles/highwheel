@@ -20,7 +20,7 @@ class DependencyMethodVisitor extends MethodVisitor {
 
   public DependencyMethodVisitor(final AccessPoint owner,
       final AccessVisitor typeReceiver, NameTransformer nameTransformer) {
-    super(Opcodes.ASM4, null);
+    super(Opcodes.ASM5, null);
     this.typeReceiver = typeReceiver;
     this.parent = owner;
     this.nameTransformer = nameTransformer;
@@ -28,7 +28,7 @@ class DependencyMethodVisitor extends MethodVisitor {
 
   @Override
   public void visitMethodInsn(final int opcode, final String owner,
-      final String name, final String desc) {
+      final String name, final String desc, boolean itf) {
     this.typeReceiver
         .apply(this.parent, AccessPoint.create(
             nameTransformer.transform(owner), AccessPointName.create(name, desc)),
