@@ -31,12 +31,6 @@
 		</developer>
 	</developers>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
-
 	<modules>
 		<module>highwheel-model</module>
 		<module>highwheel-core</module>
@@ -179,9 +173,22 @@
 		</profile>
 	</profiles>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
 	<!-- versions of libraries which are used in different projects or which 
 		are used for few artifacts -->
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<hamcrest.version>1.3.RC2</hamcrest.version>
 		<junit.version>4.10</junit.version>
 		<surefire.version>2.12</surefire.version>
