@@ -3,6 +3,7 @@ package org.pitest.highwheel.modules.model;
 import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.util.GlobToRegex;
 import org.pitest.highwheel.util.base.Optional;
+import org.pitest.highwheel.util.validation.Objects;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -37,5 +38,23 @@ public final class Module {
                 "name='" + name + '\'' +
                 ", patternLiteral='" + patternLiteral + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Module module = (Module) o;
+
+        return Objects.equals(this.name,module.name) &&
+                Objects.equals(this.patternLiteral, module.patternLiteral);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + patternLiteral.hashCode();
+        return result;
     }
 }

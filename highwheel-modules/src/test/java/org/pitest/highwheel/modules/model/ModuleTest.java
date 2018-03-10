@@ -6,7 +6,9 @@ import org.pitest.highwheel.model.ElementName;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ModuleTest {
-    private final Module testee = Module.make("module name", "org.pitest.foo*").get();
+    public static final String MODULE_NAME = "module name";
+    public static final String GLOB = "org.pitest.foo*";
+    private final Module testee = Module.make(MODULE_NAME, GLOB).get();
 
     @Test
     public void makeShouldFailIfRegexPassedIsInvalid() {
@@ -26,5 +28,10 @@ public class ModuleTest {
     @Test
     public void containsShouldBeFalseIfElementNameDoesNotMatchPattern() {
         assertThat(testee.contains(new ElementName("not.pitest.foo"))).isFalse();
+    }
+
+    @Test
+    public void equalsShouldWorkOnModuleNameAndGlob() {
+        assertThat(testee).isEqualTo(Module.make(MODULE_NAME,GLOB).get());
     }
 }
