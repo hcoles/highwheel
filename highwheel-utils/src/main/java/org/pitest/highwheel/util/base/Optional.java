@@ -74,4 +74,11 @@ public final class Optional<T> {
         else
             return value;
     }
+
+    public Optional<T> orThrow(RuntimeException t) {
+        if(value == null)
+            throw t;
+        else
+            return this;
+    }
 }

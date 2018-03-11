@@ -170,4 +170,14 @@ public class OptionalTest {
         assertThat(testee.orElseGet(supplier)).isEqualTo(53);
         assertThat(consumerCalled.get()).isFalse();
     }
+
+    @Test(expected = RuntimeException.class)
+    public void orThrowShouldThrowExceptionOnEmpty() {
+        Optional.<Object>empty().orThrow(new RuntimeException());
+    }
+
+    @Test
+    public void orThrowShouldNotThrowExceptionOnPresent() {
+        Optional.of("asdf").orThrow(new RuntimeException());
+    }
 }
