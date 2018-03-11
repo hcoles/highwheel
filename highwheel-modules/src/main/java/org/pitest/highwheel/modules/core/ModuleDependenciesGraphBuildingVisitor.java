@@ -11,7 +11,7 @@ import java.util.*;
 
 public class ModuleDependenciesGraphBuildingVisitor implements AccessVisitor {
 
-    private static class NoOpWarningCollector implements WarningsCollector {
+    private static class NoOpWarningsCollector implements WarningsCollector {
         @Override
         public void constructionWarning(Module m) {}
 
@@ -30,6 +30,10 @@ public class ModuleDependenciesGraphBuildingVisitor implements AccessVisitor {
         this. modules = modules;
         this.graph = graph;
         this.warningsCollector = warningsCollector;
+        addModulesToGraph();
+    }
+
+    private void addModulesToGraph() {
         final Set<String> processedModuleNames = new HashSet<String>(modules.size());
         for(Module module: modules) {
             graph.addModule(module);
@@ -40,11 +44,8 @@ public class ModuleDependenciesGraphBuildingVisitor implements AccessVisitor {
         }
     }
 
-    public ModuleDependenciesGraphBuildingVisitor(
-            final Collection<Module> modules,
-            final ModuleGraph graph
-    ) {
-        this(modules,graph, new NoOpWarningCollector());
+    public ModuleDependenciesGraphBuildingVisitor(final Collection<Module> modules, final ModuleGraph graph) {
+        this(modules,graph, new NoOpWarningsCollector());
     }
 
     @Override

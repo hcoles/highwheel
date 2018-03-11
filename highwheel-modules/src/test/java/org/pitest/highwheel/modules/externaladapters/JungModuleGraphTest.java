@@ -195,4 +195,36 @@ public class JungModuleGraphTest {
 
         assertThat(testee.fanOutOf(m1).get()).isEqualTo(1);
     }
+
+    @Test
+    public void dependenciesShouldReturnEmptyCollectionIfNothingConnectedToModule(){
+        testee.addModule(m1);
+        testee.addModule(m2);
+
+        testee.addDependency(m1,m2);
+
+        assertThat(testee.dependencies(m2).isEmpty()).isTrue();
+    }
+
+    @Test
+    public void dependenciesShouldReturnEmptyCollectionIfModuleNotPresent(){
+        testee.addModule(m1);
+        testee.addModule(m2);
+
+        testee.addDependency(m1,m2);
+
+        assertThat(testee.dependencies(m3).isEmpty()).isTrue();
+    }
+
+    @Test
+    public void dendenciesShouldReturnCollectionOfDependencies() {
+        testee.addModule(m1);
+        testee.addModule(m2);
+        testee.addModule(m3);
+
+        testee.addDependency(m1,m2);
+        testee.addDependency(m1,m3);
+
+        assertThat(testee.dependencies(m1)).contains(m2,m3);
+    }
 }

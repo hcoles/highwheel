@@ -94,6 +94,19 @@ public class ModuleDependenciesGraphBuildingVisitorTest {
     }
 
     @Test
+    public void applyShouldNotConnectionInUnmatchingElements() {
+        final AccessPoint source = AccessPoint.create(ElementName.fromString("NOTORG.example.core.Service"));
+        final AccessPoint dest = AccessPoint.create(ElementName.fromString("org.example.io.FileReader"));
+
+        testee.apply(source,dest,null);
+
+        final Optional<ModuleDependency> moduleDependency = moduleGraph.findDependency(CORE,IO);
+
+        assertThat(moduleDependency.isPresent()).isFalse();
+        assertThat(graph.getEdges().isEmpty()).isTrue();
+    }
+
+    @Test
     public void applyShouldNotAddSelfDependencies() {
         final AccessPoint source = AccessPoint.create(ElementName.fromString("org.example.core.Service"));
         final AccessPoint dest = AccessPoint.create(ElementName.fromString("org.example.core.FileReader"));

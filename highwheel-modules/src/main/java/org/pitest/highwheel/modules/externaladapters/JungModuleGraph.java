@@ -10,10 +10,12 @@ import org.pitest.highwheel.util.base.Optional;
 import org.pitest.highwheel.util.base.Supplier;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 public class JungModuleGraph implements ModuleGraph, ModuleMetrics {
 
-    final DirectedGraph<Module,ModuleDependency> graph;
+    private final DirectedGraph<Module,ModuleDependency> graph;
 
     public JungModuleGraph(DirectedGraph<Module,ModuleDependency> graph) {
         this.graph = graph;
@@ -44,6 +46,11 @@ public class JungModuleGraph implements ModuleGraph, ModuleMetrics {
     @Override
     public void addModule(Module vertex) {
         graph.addVertex(vertex);
+    }
+
+    @Override
+    public Collection<Module> dependencies(Module vertex) {
+        return Optional.ofNullable(graph.getSuccessors(vertex)).orElse(Collections.<Module>emptyList());
     }
 
     @Override
