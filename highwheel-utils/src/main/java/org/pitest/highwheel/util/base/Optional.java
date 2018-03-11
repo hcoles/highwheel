@@ -49,17 +49,29 @@ public final class Optional<T> {
         return value != null;
     }
 
-    public <S> Optional<S> map(Function<T,S> function) {
+    public <S> Optional<S> map(Function<? super T,? extends S> function) {
         if(value == null)
             return Optional.empty();
         else
             return new Optional<S>(function.apply(value));
     }
 
-    public <S> Optional<S> flatMap(Function<T,Optional<S>> function) {
+    public <S> Optional<S> flatMap(Function<? super T,Optional<S>> function) {
         if(value == null)
             return Optional.empty();
         else
             return function.apply(value);
+    }
+
+    public void forEach(Consumer<? super T> consumer) {
+        if(value != null)
+            consumer.consume(value);
+    }
+
+    public T orElseGet(Supplier<? extends T> supplier) {
+        if(value == null)
+            return supplier.supply();
+        else
+            return value;
     }
 }

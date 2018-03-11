@@ -2,6 +2,8 @@ package org.pitest.highwheel.util.base;
 
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.fest.assertions.api.Assertions.assertThat;
 
 
@@ -106,5 +108,66 @@ public class OptionalTest {
 
         Optional<Integer> testee = Optional.empty();
         assertThat(testee.flatMap(increase).isPresent()).isFalse();
+    }
+
+    @Test
+    public void shouldCallConsumerIfPresent() {
+        final AtomicBoolean consumerCalled = new AtomicBoolean(false);
+        final Consumer<Integer> consumer = new Consumer<Integer>() {
+            @Override
+            public void consume(Integer value) {
+                consumerCalled.set(true);
+            }
+        };
+
+        final Optional<Integer> testee = Optional.of(10);
+        testee.forEach(consumer);
+        assertThat(consumerCalled.get()).isTrue();
+    }
+
+    @Test
+    public void shouldNotCallConsumerIfAbsent() {
+        final AtomicBoolean consumerCalled = new AtomicBoolean(false);
+        final Consumer<Integer> consumer = new Consumer<Integer>() {
+            @Override
+            public void consume(Integer value) {
+                consumerCalled.set(true);
+            }
+        };
+
+        final Optional<Integer> testee = Optional.empty();
+        testee.forEach(consumer);
+        assertThat(consumerCalled.get()).isFalse();
+    }
+
+    @Test
+    public void orElseGetShouldCallSupplierIfEmpty() {
+        final Supplier<Integer> supplier = new Supplier<Integer>() {
+            @Override
+            public Integer supply() {
+                return 42;
+            }
+        };
+
+        final Optional<Integer> testee = Optional.empty();
+
+        assertThat(testee.orElseGet(supplier)).isEqualTo(42);
+    }
+
+    @Test
+    public void orElseGetShouldNotCallSupplierIfDefined() {
+        final AtomicBoolean consumerCalled = new AtomicBoolean(false);
+        final Supplier<Integer> supplier = new Supplier<Integer>() {
+            @Override
+            public Integer supply() {
+                consumerCalled.set(true);
+                return 42;
+            }
+        };
+
+        final Optional<Integer> testee = Optional.of(53);
+
+        assertThat(testee.orElseGet(supplier)).isEqualTo(53);
+        assertThat(consumerCalled.get()).isFalse();
     }
 }
