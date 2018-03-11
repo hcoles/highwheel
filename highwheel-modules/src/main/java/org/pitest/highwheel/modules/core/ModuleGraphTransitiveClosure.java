@@ -5,9 +5,7 @@ import org.pitest.highwheel.modules.model.ModuleGraph;
 import org.pitest.highwheel.util.base.Function;
 import org.pitest.highwheel.util.base.Optional;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Calculate the Transitive closure of a ModuleGraph using the Floyd-Warshall algorithm
@@ -17,10 +15,26 @@ import java.util.Map;
  */
 public class ModuleGraphTransitiveClosure {
 
+    public static class Difference{
+        public final Module source;
+        public final Module dest;
+        public final int firstDistance;
+        public final int secondDistance;
+
+        public Difference(Module source, Module dest, int firstDistance, int secondDistance) {
+            this.source = source;
+            this.dest = dest;
+            this.firstDistance = firstDistance;
+            this.secondDistance = secondDistance;
+        }
+    }
+
     private final int[][] distanceMatrix;
     private final Map<Module,Integer> indexMap;
+    private final Collection<Module> modules;
 
     public ModuleGraphTransitiveClosure(ModuleGraph moduleGraph, Collection<Module> modules) {
+        this.modules = modules;
         distanceMatrix = initialiseSquareMatrixTo(modules.size(),Integer.MAX_VALUE);
         indexMap = createMapModuleIndex(modules);
 
@@ -82,7 +96,31 @@ public class ModuleGraphTransitiveClosure {
     }
 
     public boolean same(ModuleGraphTransitiveClosure other) {
-        return false;
+        final Function<List<Difference>,Boolean> emptyList = new Function<List<Difference>, Boolean>() {
+            @Override
+            public Boolean apply(List<Difference> argument) {
+                return argument.isEmpty();
+            }
+        };
+        return diff(other).map(emptyList).orElse(false);
+    }
+
+    public Optional<List<Difference>> diff(ModuleGraphTransitiveClosure other) {
+        if(!modules.containsAll(other.modules) || !other.modules.containsAll(modules))
+            return Optional.empty();
+        final List<Difference> differences = new ArrayList<Difference>();
+        for(Module i : modules) {
+            for (Module j : modules) {
+                int thisI = indexMap.get(i),
+                        thisJ = indexMap.get(j),
+                        otherI = indexMap.get(i),
+                        otherJ = indexMap.get(j);
+                if(distanceMatrix[thisI][thisJ] != other.distanceMatrix[otherI][otherJ])
+                    differences.add(new Difference(i,j,distanceMatrix[thisI][thisJ],
+                            other.distanceMatrix[otherI][otherJ]));
+            }
+        }
+        return Optional.of(differences);
     }
 
     public Optional<Integer> minimumDistance(Module vertex1, Module vertex2) {

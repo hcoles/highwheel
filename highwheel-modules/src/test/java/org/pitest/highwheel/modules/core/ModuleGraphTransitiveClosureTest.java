@@ -96,4 +96,196 @@ public class ModuleGraphTransitiveClosureTest {
             }
         }
     }
+
+    @Test
+    public void sameShouldReturnTrueOnTransitiveClosureThatAreEqual() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("Main","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+
+        assertThat(testee.same(otherTestee)).isTrue();
+    }
+
+    @Test
+    public void sameShouldReturnFalseOnTransitiveClosureWithDifferentModules() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("DIFFERENT NAME","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+
+        assertThat(testee.same(otherTestee)).isFalse();
+    }
+
+    @Test
+    public void sameShouldReturnFalseOnTransitiveClosureWithDifferentDependencies() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("Main","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        //moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+
+        assertThat(testee.same(otherTestee)).isFalse();
+    }
+
+    @Test
+    public void diffShouldReturnEmptyListOnTransitiveClosureThatAreEqual() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("Main","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+
+        assertThat(testee.diff(otherTestee).get().isEmpty()).isTrue();
+    }
+
+    @Test
+    public void diffShouldReturnEmptyOnTransitiveClosureWithDifferentModules() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("DIFFERENT NAME","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+
+        assertThat(testee.diff(otherTestee).isPresent()).isFalse();
+    }
+
+    @Test
+    public void diffShouldReturnListOfDifferencesOnTransitiveClosureWithDifferentDependencies() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("Main","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        //moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+        final List<ModuleGraphTransitiveClosure.Difference> differences = testee.diff(otherTestee).get();
+
+        assertThat(differences.size()).isEqualTo(1);
+
+        assertThat(differences.get(0).source).isEqualTo(MAIN);
+        assertThat(differences.get(0).dest).isEqualTo(CORE);
+        assertThat(differences.get(0).firstDistance).isEqualTo(1);
+        assertThat(differences.get(0).secondDistance).isEqualTo(2);
+    }
 }
