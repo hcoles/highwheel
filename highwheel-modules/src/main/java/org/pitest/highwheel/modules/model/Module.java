@@ -10,8 +10,8 @@ import java.util.regex.PatternSyntaxException;
 
 public final class Module {
 
-    private final String name;
-    private final String patternLiteral;
+    public final String name;
+    public final String patternLiteral;
     private final Pattern pattern;
 
     private Module(String name, String patternLiteral) {
