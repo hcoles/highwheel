@@ -26,7 +26,7 @@ public class ModuleGraphTransitiveClosure {
 
         initialiseDistanceOneModules(modules,moduleGraph);
 
-        applyFloydWarshallMainIteration(modules);
+        applyFloydWarshallMainIteration();
     }
 
     private int[][] initialiseSquareMatrixTo(final int size, final int value) {
@@ -54,18 +54,17 @@ public class ModuleGraphTransitiveClosure {
         }
     }
 
-    private void applyFloydWarshallMainIteration(Collection<Module> vertices) {
-        for(Module i : vertices) {
-            for(Module j : vertices) {
-                for(Module k : vertices) {
-                    int indexI = indexMap.get(i), indexJ = indexMap.get(j), indexK = indexMap.get(k);
-                    int distanceIJ = distanceMatrix[indexI][indexJ];
-                    int distanceIK = distanceMatrix[indexI][indexK];
-                    int distanceKJ = distanceMatrix[indexK][indexJ];
+    private void applyFloydWarshallMainIteration() {
+        for(int i = 0; i < distanceMatrix.length; ++i) {
+            for(int j = 0; j < distanceMatrix.length; ++j) {
+                for(int k = 0; k < distanceMatrix.length; ++k) {
+                    int distanceIJ = distanceMatrix[i][j];
+                    int distanceIK = distanceMatrix[i][k];
+                    int distanceKJ = distanceMatrix[k][j];
                     if(distanceIJ == Integer.MAX_VALUE && distanceIK < Integer.MAX_VALUE && distanceKJ < Integer.MAX_VALUE) {
-                        distanceMatrix[indexI][indexJ] = distanceIK + distanceKJ;
+                        distanceMatrix[i][j] = distanceIK + distanceKJ;
                     } else if(distanceIJ < Integer.MAX_VALUE && distanceIK < Integer.MAX_VALUE && distanceKJ < Integer.MAX_VALUE) {
-                        distanceMatrix[indexI][indexJ] = Math.min(distanceIJ,distanceIK + distanceKJ);
+                        distanceMatrix[i][j] = Math.min(distanceIJ,distanceIK + distanceKJ);
                     }
                 }
             }
