@@ -8,6 +8,7 @@ import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.ModuleDependency;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -71,6 +72,33 @@ public class ModuleGraphTransitiveClosureTest {
     }
 
     @Test
+    public void minimumDistancePathShouldBeEmptyForNotDependentModules() {
+        assertThat(testee.minimumDistancePath(COMMONS,COMMONS)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(CORE,CORE)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(FACADE,FACADE)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(IO,IO)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(ENDPOINTS,ENDPOINTS)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(MAIN,MAIN)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(COMMONS,CORE)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(COMMONS,FACADE)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(COMMONS,IO)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(COMMONS,ENDPOINTS)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(COMMONS,MAIN)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(CORE,FACADE)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(CORE,IO)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(CORE,ENDPOINTS)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(CORE,MAIN)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(FACADE,IO)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(FACADE,ENDPOINTS)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(FACADE,MAIN)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(IO,ENDPOINTS)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(IO,FACADE)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(IO,MAIN)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(ENDPOINTS,IO)).isEqualTo(Collections.<Module>emptyList());
+        assertThat(testee.minimumDistancePath(ENDPOINTS,MAIN)).isEqualTo(Collections.<Module>emptyList());
+    }
+
+    @Test
     public void minimumDistanceShouldBeTheExpectedOneForDependentModules() {
         assertThat(testee.minimumDistance(CORE,COMMONS).get()).isEqualTo(1);
         assertThat(testee.minimumDistance(FACADE,CORE).get()).isEqualTo(1);
@@ -85,6 +113,23 @@ public class ModuleGraphTransitiveClosureTest {
         assertThat(testee.minimumDistance(MAIN,ENDPOINTS).get()).isEqualTo(1);
         assertThat(testee.minimumDistance(MAIN,FACADE).get()).isEqualTo(2);
         assertThat(testee.minimumDistance(MAIN,COMMONS).get()).isEqualTo(2);
+    }
+
+    @Test
+    public void minimumDistancePathShouldBeTheExpectedOneForDependentModules() {
+        assertThat(testee.minimumDistancePath(CORE,COMMONS)).isEqualTo(Arrays.asList(COMMONS));
+        assertThat(testee.minimumDistancePath(FACADE,CORE)).isEqualTo(Arrays.asList(CORE));
+        assertThat(testee.minimumDistancePath(FACADE,COMMONS)).isEqualTo(Arrays.asList(CORE,COMMONS));
+        assertThat(testee.minimumDistancePath(IO,COMMONS)).isEqualTo(Arrays.asList(COMMONS));
+        assertThat(testee.minimumDistancePath(IO,CORE)).isEqualTo(Arrays.asList(CORE));
+        assertThat(testee.minimumDistancePath(ENDPOINTS,FACADE)).isEqualTo(Arrays.asList(FACADE));
+        assertThat(testee.minimumDistancePath(ENDPOINTS,CORE)).isEqualTo(Arrays.asList(FACADE,CORE));
+        assertThat(testee.minimumDistancePath(ENDPOINTS,COMMONS)).isEqualTo(Arrays.asList(COMMONS));
+        assertThat(testee.minimumDistancePath(MAIN,CORE)).isEqualTo(Arrays.asList(CORE));
+        assertThat(testee.minimumDistancePath(MAIN,IO)).isEqualTo(Arrays.asList(IO));
+        assertThat(testee.minimumDistancePath(MAIN,ENDPOINTS)).isEqualTo(Arrays.asList(ENDPOINTS));
+        assertThat(testee.minimumDistancePath(MAIN,FACADE)).isEqualTo(Arrays.asList(ENDPOINTS,FACADE));
+        assertThat(testee.minimumDistancePath(MAIN,COMMONS).size()).isEqualTo(2);
     }
 
     @Test
@@ -287,5 +332,106 @@ public class ModuleGraphTransitiveClosureTest {
         assertThat(differences.get(0).dest).isEqualTo(CORE);
         assertThat(differences.get(0).firstDistance).isEqualTo(1);
         assertThat(differences.get(0).secondDistance).isEqualTo(2);
+    }
+
+    @Test
+    public void diffPathShouldReturnEmptyListOnTransitiveClosureThatAreEqual() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("Main","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+
+        assertThat(testee.diffPath(otherTestee).get().isEmpty()).isTrue();
+    }
+
+    @Test
+    public void diffPathShouldReturnEmptyOnTransitiveClosureWithDifferentModules() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("DIFFERENT NAME","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+
+        assertThat(testee.diffPath(otherTestee).isPresent()).isFalse();
+    }
+
+    @Test
+    public void diffPathShouldReturnListOfDifferencesOnTransitiveClosureWithDifferentDependencies() {
+        final Module CORE_2 = Module.make("Core", "org.example.core.*").get();
+        final Module FACADE_2 = Module.make("Facade", "org.example.core.external.*").get();
+        final Module IO_2 = Module.make("IO", "org.example.io.*").get();
+        final Module COMMONS_2 = Module.make("Commons", "org.example.commons.*").get();
+        final Module ENDPOINTS_2 = Module.make("Endpoints", "org.example.endpoints.*").get();
+        final Module MAIN_2 = Module.make("Main","org.example.Main").get();
+
+        final List<Module> modules_2 = Arrays.asList(CORE_2,FACADE_2,IO_2,COMMONS_2,ENDPOINTS_2,MAIN_2);
+        final DirectedSparseGraph<Module,ModuleDependency> graph_2 = new DirectedSparseGraph<Module, ModuleDependency>();
+        final JungModuleGraph moduleGraph_2 = new JungModuleGraph(graph_2);
+
+        for(Module module: modules_2) {
+            moduleGraph_2.addModule(module);
+        }
+        moduleGraph_2.addDependency(CORE_2,COMMONS_2);
+        moduleGraph_2.addDependency(FACADE_2,CORE_2);
+        moduleGraph_2.addDependency(IO_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,COMMONS_2);
+        moduleGraph_2.addDependency(ENDPOINTS_2,FACADE_2);
+        moduleGraph_2.addDependency(IO_2,CORE_2);
+        moduleGraph_2.addDependency(MAIN_2,ENDPOINTS_2);
+        moduleGraph_2.addDependency(MAIN_2,IO_2);
+        //moduleGraph_2.addDependency(MAIN_2,CORE_2);
+
+        final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
+        final List<ModuleGraphTransitiveClosure.PathDifference> differences = testee.diffPath(otherTestee).get();
+
+        System.out.println(differences);
+        assertThat(differences.size()).isEqualTo(1);
+
+        assertThat(differences.get(0).source).isEqualTo(MAIN);
+        assertThat(differences.get(0).dest).isEqualTo(CORE);
+        assertThat(differences.get(0).firstPath).isEqualTo(Arrays.asList(CORE));
+        assertThat(differences.get(0).secondPath.size()).isEqualTo(2);
+        assertThat(differences.get(0).secondPath.get(1)).isEqualTo(CORE);
     }
 }

@@ -10,7 +10,6 @@ import org.codehaus.jparsec.functors.Map4;
 import org.pitest.highwheel.modules.specification.SyntaxTree;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 

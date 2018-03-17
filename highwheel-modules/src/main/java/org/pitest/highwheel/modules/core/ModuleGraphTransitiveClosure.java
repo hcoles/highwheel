@@ -27,15 +27,49 @@ public class ModuleGraphTransitiveClosure {
             this.firstDistance = firstDistance;
             this.secondDistance = secondDistance;
         }
+
+        @Override
+        public String toString() {
+            return "Difference{" +
+                    "source=" + source +
+                    ", dest=" + dest +
+                    ", firstDistance=" + firstDistance +
+                    ", secondDistance=" + secondDistance +
+                    '}';
+        }
     }
 
-    private final int[][] distanceMatrix;
+    public static class PathDifference {
+        public final Module source;
+        public final Module dest;
+        public final List<Module> firstPath;
+        public final List<Module> secondPath;
+
+        public PathDifference(Module source, Module dest, List<Module> firstPath, List<Module> secondPath) {
+            this.source = source;
+            this.dest = dest;
+            this.firstPath = firstPath;
+            this.secondPath = secondPath;
+        }
+
+        @Override
+        public String toString() {
+            return "PathDifference{" +
+                    "source=" + source +
+                    ", dest=" + dest +
+                    ", firstPath=" + firstPath +
+                    ", secondPath=" + secondPath +
+                    '}';
+        }
+    }
+
+    private final List<Module>[][] minimumPathMatrix;
     private final Map<Module,Integer> indexMap;
     private final Collection<Module> modules;
 
     public ModuleGraphTransitiveClosure(ModuleGraph moduleGraph, Collection<Module> modules) {
         this.modules = modules;
-        distanceMatrix = initialiseSquareMatrixTo(modules.size(),Integer.MAX_VALUE);
+        minimumPathMatrix = initialiseSquareMatrixTo(modules.size());
         indexMap = createMapModuleIndex(modules);
 
         initialiseDistanceOneModules(modules,moduleGraph);
@@ -43,11 +77,12 @@ public class ModuleGraphTransitiveClosure {
         applyFloydWarshallMainIteration();
     }
 
-    private int[][] initialiseSquareMatrixTo(final int size, final int value) {
-        final int[][] array = new int[size][size];
+    @SuppressWarnings("unchecked")
+    private List<Module>[][] initialiseSquareMatrixTo(final int size) {
+        final List<Module>[][] array = (List<Module>[][]) new List[size][size];
         for(int i=0; i < array.length; ++i)
             for(int j=0; j < array.length; ++j)
-                array[i][j] = value;
+                array[i][j] = new ArrayList<Module>();
         return array;
     }
 
@@ -63,22 +98,28 @@ public class ModuleGraphTransitiveClosure {
     private void initialiseDistanceOneModules(Collection<Module> modules, ModuleGraph moduleGraph){
         for(Module module : modules) {
             for(Module dependency : moduleGraph.dependencies(module)) {
-                distanceMatrix[indexMap.get(module)][indexMap.get(dependency)] = 1;
+                minimumPathMatrix[indexMap.get(module)][indexMap.get(dependency)].add(dependency);
             }
         }
     }
 
     private void applyFloydWarshallMainIteration() {
-        for(int i = 0; i < distanceMatrix.length; ++i) {
-            for(int j = 0; j < distanceMatrix.length; ++j) {
-                for(int k = 0; k < distanceMatrix.length; ++k) {
-                    int distanceIJ = distanceMatrix[i][j];
-                    int distanceIK = distanceMatrix[i][k];
-                    int distanceKJ = distanceMatrix[k][j];
-                    if(distanceIJ == Integer.MAX_VALUE && distanceIK < Integer.MAX_VALUE && distanceKJ < Integer.MAX_VALUE) {
-                        distanceMatrix[i][j] = distanceIK + distanceKJ;
-                    } else if(distanceIJ < Integer.MAX_VALUE && distanceIK < Integer.MAX_VALUE && distanceKJ < Integer.MAX_VALUE) {
-                        distanceMatrix[i][j] = Math.min(distanceIJ,distanceIK + distanceKJ);
+        for(int i = 0; i < minimumPathMatrix.length; ++i) {
+            for(int j = 0; j < minimumPathMatrix.length; ++j) {
+                for(int k = 0; k < minimumPathMatrix.length; ++k) {
+                    List<Module> pathIJ = minimumPathMatrix[i][j];
+                    List<Module> pathIK = minimumPathMatrix[i][k];
+                    List<Module> pathKJ = minimumPathMatrix[k][j];
+                    if(pathIJ.isEmpty() && ! pathIK.isEmpty() && !pathKJ.isEmpty()) {
+                        minimumPathMatrix[i][j].clear();
+                        minimumPathMatrix[i][j].addAll(pathIK);
+                        minimumPathMatrix[i][j].addAll(pathKJ);
+                    } else if(!pathIJ.isEmpty() && !pathIK.isEmpty() && !pathKJ.isEmpty()) {
+                        if(pathIK.size() + pathKJ.size() < pathIJ.size()) {
+                            minimumPathMatrix[i][j].clear();
+                            minimumPathMatrix[i][j].addAll(pathIK);
+                            minimumPathMatrix[i][j].addAll(pathKJ);
+                        }
                     }
                 }
             }
@@ -106,18 +147,31 @@ public class ModuleGraphTransitiveClosure {
     }
 
     public Optional<List<Difference>> diff(ModuleGraphTransitiveClosure other) {
+        return diffPath(other).map(new Function<List<PathDifference>, List<Difference>>() {
+            @Override
+            public List<Difference> apply(List<PathDifference> argument) {
+                final List<Difference> result = new ArrayList<Difference>(argument.size());
+                for(PathDifference pathDifference: argument) {
+                    result.add(new Difference(pathDifference.source,pathDifference.dest,pathDifference.firstPath.size(),pathDifference.secondPath.size()));
+                }
+                return result;
+            }
+        });
+    }
+
+    public Optional<List<PathDifference>> diffPath(ModuleGraphTransitiveClosure other) {
         if(!modules.containsAll(other.modules) || !other.modules.containsAll(modules))
             return Optional.empty();
-        final List<Difference> differences = new ArrayList<Difference>();
+        final List<PathDifference> differences = new ArrayList<PathDifference>();
         for(Module i : modules) {
             for (Module j : modules) {
                 int thisI = indexMap.get(i),
                         thisJ = indexMap.get(j),
                         otherI = indexMap.get(i),
                         otherJ = indexMap.get(j);
-                if(distanceMatrix[thisI][thisJ] != other.distanceMatrix[otherI][otherJ])
-                    differences.add(new Difference(i,j,distanceMatrix[thisI][thisJ],
-                            other.distanceMatrix[otherI][otherJ]));
+                if(minimumPathMatrix[thisI][thisJ].size() != other.minimumPathMatrix[otherI][otherJ].size())
+                    differences.add(new PathDifference(i,j, minimumPathMatrix[thisI][thisJ],
+                            other.minimumPathMatrix[otherI][otherJ]));
             }
         }
         return Optional.of(differences);
@@ -126,7 +180,16 @@ public class ModuleGraphTransitiveClosure {
     public Optional<Integer> minimumDistance(Module vertex1, Module vertex2) {
         if(indexMap.get(vertex1) == null || indexMap.get(vertex2) == null)
             return Optional.empty();
+        else {
+            final int distance = minimumPathMatrix[indexMap.get(vertex1)][indexMap.get(vertex2)].size();
+            return Optional.of(distance == 0 ? Integer.MAX_VALUE : distance);
+        }
+    }
+
+    public List<Module> minimumDistancePath(Module vertex1, Module vertex2) {
+        if(indexMap.get(vertex1) == null || indexMap.get(vertex2) == null)
+            return new ArrayList<Module>();
         else
-            return Optional.of(distanceMatrix[indexMap.get(vertex1)][indexMap.get(vertex2)]);
+            return minimumPathMatrix[indexMap.get(vertex1)][indexMap.get(vertex2)];
     }
 }
