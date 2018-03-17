@@ -1,0 +1,11 @@
+modules:
+    Core = "com.pitest.highwheel.core.*"
+    Utils = "com.pitest.highwheel.utils.*"
+    Modules = "com.pitest.highwheel.modules.*"
+    Parser = "com.pitest.highwheel.parser.*"
+rules:
+    Parser -> Core -> Utils
+    Utils -/-> Core
+    Utils -/-> Parser
+    Modules -> Core
+    Modules -> Utils
