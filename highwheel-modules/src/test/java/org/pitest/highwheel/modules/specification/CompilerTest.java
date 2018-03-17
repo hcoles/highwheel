@@ -1,10 +1,10 @@
 package org.pitest.highwheel.modules.specification;
 
 import org.junit.Test;
+import org.pitest.highwheel.modules.model.Definition;
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.rules.Dependency;
 import org.pitest.highwheel.modules.model.rules.NoDirectDependency;
-import org.pitest.highwheel.modules.model.rules.Rule;
 
 import java.util.Arrays;
 
@@ -56,7 +56,7 @@ public class CompilerTest {
                         new SyntaxTree.ModuleDefinition("io","io")
                 ),
                 Arrays.<SyntaxTree.Rule>asList(new SyntaxTree.ChainDependencyRule("core","commons")));
-        Compiler.Definition actual = testee.compile(definition);
+        Definition actual = testee.compile(definition);
         assertThat(actual.modules).containsAll(Arrays.asList(CORE,COMMONS,IO,MAIN));
     }
 
@@ -70,8 +70,8 @@ public class CompilerTest {
                         new SyntaxTree.ModuleDefinition("io","io")
                 ),
                 Arrays.<SyntaxTree.Rule>asList(new SyntaxTree.ChainDependencyRule("main","core","commons")));
-        Compiler.Definition actual = testee.compile(definition);
-        assertThat(actual.rules).containsAll(Arrays.asList(new Dependency(MAIN,CORE), new Dependency(CORE,COMMONS)));
+        Definition actual = testee.compile(definition);
+        assertThat(actual.dependencies).containsAll(Arrays.asList(new Dependency(MAIN,CORE), new Dependency(CORE,COMMONS)));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class CompilerTest {
                         new SyntaxTree.ModuleDefinition("io","io")
                 ),
                 Arrays.<SyntaxTree.Rule>asList(new SyntaxTree.NoDependentRule("core","io")));
-        Compiler.Definition actual = testee.compile(definition);
-        assertThat(actual.rules).containsAll(Arrays.<Rule>asList(new NoDirectDependency(CORE,IO)));
+        Definition actual = testee.compile(definition);
+        assertThat(actual.noDirectDependencies).containsAll(Arrays.asList(new NoDirectDependency(CORE,IO)));
     }
 }

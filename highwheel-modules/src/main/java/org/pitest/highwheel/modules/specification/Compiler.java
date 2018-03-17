@@ -1,5 +1,6 @@
 package org.pitest.highwheel.modules.specification;
 
+import org.pitest.highwheel.modules.model.Definition;
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.rules.Dependency;
 import org.pitest.highwheel.modules.model.rules.NoDirectDependency;
@@ -14,29 +15,21 @@ public class Compiler {
     public static final String MODULE_ALREADY_DEFINED = "Module '%s' has already been defined";
     public static final String MODULE_HAS_NOT_BEEN_DEFINED = "Module '%s' referenced in rule '%s' has not been defined";
 
-    public static class Definition {
-        public final Collection<Module> modules;
-        public final Collection<Rule> rules;
+    private static class Pair<A,B> {
+        public final A first;
+        public final B second;
 
-        public Definition(Collection<Module> modules, Collection<Rule> rules) {
-            this.modules = modules;
-            this.rules = rules;
-        }
-
-        @Override
-        public String toString() {
-            return "Definition{" +
-                    "modules=" + modules +
-                    ", rules=" + rules +
-                    '}';
+        public Pair(A first, B second) {
+            this.first = first;
+            this.second = second;
         }
     }
 
     public Definition compile(SyntaxTree.Definition definition) {
         final Map<String,Module> modules = compileModules(definition.moduleDefinitions);
-        final List<Rule> rules = compileRules(definition.rules,modules);
+        final Pair<List<Dependency>,List<NoDirectDependency>> rules = compileRules(definition.rules,modules);
 
-        return new Definition(modules.values(),rules);
+        return new Definition(modules.values(),rules.first,rules.second);
     }
 
     private Map<String,Module> compileModules(List<SyntaxTree.ModuleDefinition> definitions) {
@@ -56,22 +49,23 @@ public class Compiler {
         return modules;
     }
 
-    private List<Rule> compileRules(List<SyntaxTree.Rule> rulesDefinition, Map<String, Module> modules) {
-        final List<Rule> rules = new ArrayList<Rule>();
+    private Pair<List<Dependency>,List<NoDirectDependency>> compileRules(List<SyntaxTree.Rule> rulesDefinition, Map<String, Module> modules) {
+        final List<Dependency> dependencies = new ArrayList<Dependency>();
+        final List<NoDirectDependency> noDirectDependencies = new ArrayList<NoDirectDependency>();
         for(SyntaxTree.Rule ruleDefinition: rulesDefinition) {
             if(ruleDefinition instanceof SyntaxTree.ChainDependencyRule) {
                 SyntaxTree.ChainDependencyRule chainDependencyRule = (SyntaxTree.ChainDependencyRule) ruleDefinition;
-                rules.addAll(compileChainDependencies(chainDependencyRule.moduleNameChain,modules));
+                dependencies.addAll(compileChainDependencies(chainDependencyRule.moduleNameChain,modules));
             } else if(ruleDefinition instanceof SyntaxTree.NoDependentRule){
                 SyntaxTree.NoDependentRule noDependentRule = (SyntaxTree.NoDependentRule) ruleDefinition;
-                rules.add(compileNoDependency(noDependentRule,modules));
+                noDirectDependencies.add(compileNoDependency(noDependentRule,modules));
             }
         }
-        return rules;
+        return new Pair<List<Dependency>,List<NoDirectDependency>>(dependencies,noDirectDependencies);
     }
 
-    private List<Rule> compileChainDependencies(List<String> chainDependencies, Map<String,Module> modules) {
-        final List<Rule> result = new ArrayList<Rule>(chainDependencies.size() - 1);
+    private List<Dependency> compileChainDependencies(List<String> chainDependencies, Map<String,Module> modules) {
+        final List<Dependency> result = new ArrayList<Dependency>(chainDependencies.size() - 1);
         for(int i = 0; i < chainDependencies.size() -1; ++i) {
             final String current = chainDependencies.get(i);
             final String next = chainDependencies.get(i+1);
