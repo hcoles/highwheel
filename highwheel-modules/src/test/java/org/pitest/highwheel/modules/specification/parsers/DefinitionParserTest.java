@@ -165,7 +165,7 @@ public class DefinitionParserTest {
     }
 
     @Test
-    public void parserShouldReadReadableIgnoringSpacesAndReturnDefinition() {
+    public void parserShouldReadReadableIgnoringSpacesAndJavaCommentsAndReturnDefinition() {
         final InputStreamReader reader = new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("./example-def.txt"));
         assertThat(testee.parse(reader)).isEqualTo(new SyntaxTree.Definition(
                 Arrays.asList(

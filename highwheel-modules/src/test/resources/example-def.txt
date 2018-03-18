@@ -8,4 +8,5 @@ rules:
     Utils -/-> Core
     Utils -/-> Parser
     Modules -> Core
-    Modules -> Utils
+    Modules -> Utils // -> Core
+    // Modules -/-> Parser

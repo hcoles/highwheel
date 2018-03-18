@@ -85,7 +85,9 @@ public final class DefinitionParser {
         }
     });
 
-    private static final Parser<Void> ignore = Scanners.among(" \t");
+    private static Parser<Void> javacomment = Scanners.JAVA_LINE_COMMENT;
+
+    private static final Parser<Void> ignore = Parsers.or(Scanners.among(" \t"),javacomment);
 
     public SyntaxTree.Definition parse(Readable readable) {
         try {
