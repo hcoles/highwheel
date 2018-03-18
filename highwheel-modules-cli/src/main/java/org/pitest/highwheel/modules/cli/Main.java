@@ -27,9 +27,6 @@ import static org.pitest.highwheel.util.StringUtil.join;
 
 public class Main {
 
-    private static String STRICT = "strict";
-    private static String LOOSE = "loose";
-
     private static Filter includeAll = new Filter() {
         @Override
         public boolean include(ElementName item) {
@@ -38,44 +35,33 @@ public class Main {
     };
 
     public static void main(String[] argv) {
-        final Options options = new Options();
-        final Option spec = Option.builder("s")
-                .longOpt("specification")
-                .optionalArg(false)
-                .hasArg(true)
-                .desc("Path to the specification file").build();
-        final Option mode = Option.builder("m")
-                .longOpt("mode")
-                .optionalArg(false)
-                .hasArg(true)
-                .desc("Mode of analysis. Can be 'strict' or 'loose'").build();
-        options.addOption(spec).addOption(mode);
-
-        final CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = null;
         try {
-            cmd = parser.parse(options, argv);
-        } catch(ParseException e) {
-            System.err.println("Error while parsing the command line arguments: "+ e.getMessage());
-            System.exit(1);
-        }
-        String specificationPath = cmd.getOptionValue("specification","spec.hwm");
-        String operationMode = cmd.getOptionValue("mode",STRICT);
-        if(! operationMode.equals(STRICT) && !operationMode.equals(LOOSE)) {
-            System.err.println("Unrecognised value for mode: " + operationMode + ". Select 'strict' or 'loose'");
-            System.exit(1);
-        }
+            final CmdParser cmdParser = new CmdParser(argv);
+            final ClasspathRoot rootClassPath = getAnalysisScope(cmdParser.argList);
 
-        final File specificationFile = new File(specificationPath);
-        if(!specificationFile.exists() || specificationFile.isDirectory() || !specificationFile.canRead()) {
-            System.err.println(String.format("Cannot read from specification file '%s'.", specificationPath));
+            System.out.println("- Compiling specification...");
+            final SyntaxTree.Definition syntaxDefinition = getDefinition(cmdParser.specificationFile);
+            final Definition definition = compileDefinition(syntaxDefinition);
+            System.out.println("- Done!");
+
+            final ClassParser classParser = new ClassPathParser(includeAll);
+            final ModuleAnalyser analyser = new ModuleAnalyser(classParser);
+            if (cmdParser.mode == ExecutionMode.STRICT) {
+                strictAnalysis(analyser,definition,rootClassPath);
+            } else {
+                looseAnalysis(analyser,definition,rootClassPath);
+            }
+        }catch(Exception e) {
+            System.err.println(e.getMessage());
             System.exit(1);
         }
+    }
 
+    private static ClasspathRoot getAnalysisScope(List<String> paths) {
         final List<File> jars = new ArrayList<File>();
         final List<File> dirs = new ArrayList<File>();
         final List<String> ignored = new ArrayList<String>();
-        for(String path : cmd.getArgList()) {
+        for(String path : paths) {
             final File f = new File(path);
             if(!f.exists() || ! f.canRead() || (f.isFile() && !path.endsWith(".jar"))) {
                 ignored.add(path);
@@ -85,16 +71,9 @@ public class Main {
                 jars.add(f);
             }
         }
-
         System.out.println("- Ignoring: " + join(", ", ignored));
         System.out.println("- Directories: "+ join(", ", getPaths(dirs)));
         System.out.println("- Jars:" + join(", ", getPaths(jars)));
-        System.out.println("- Compiling specification...");
-
-        final SyntaxTree.Definition syntaxDefinition = getDefinition(specificationFile);
-        final Definition definition = compileDefinition(syntaxDefinition);
-
-        System.out.println("- Done!");
 
         final List<ClasspathRoot> classpathRoots = new ArrayList<ClasspathRoot>();
         for(File jar : jars) {
@@ -104,55 +83,52 @@ public class Main {
             classpathRoots.add(new DirectoryClassPathRoot(dir));
         }
 
-        final ClasspathRoot rootClassPath = new CompoundClassPathRoot(classpathRoots);
-        final ClassParser classParser = new ClassPathParser(includeAll);
-        final ModuleAnalyser analyser = new ModuleAnalyser(classParser);
-        try {
-            if (operationMode.equals(STRICT)) {
-                AnalyserModel.StrictAnalysisResult analysisResult = analyser.analyseStrict(rootClassPath, definition);
-                System.out.println("- Analysis complete");
-                System.out.println("- Metrics: ");
-                printMetrics(analysisResult.metrics);
-                boolean error = !analysisResult.dependencyViolations.isEmpty() || !analysisResult.noStrictDependencyViolations.isEmpty();
-                if(analysisResult.dependencyViolations.isEmpty()) {
-                    System.out.println("- No dependency violation detected");
-                } else {
-                    System.err.println("- The following dependencies violate the specification:");
-                    printDependencyViolations(analysisResult.dependencyViolations);
-                }
-                if(analysisResult.noStrictDependencyViolations.isEmpty()) {
-                    System.out.println("- No direct dependency violation detected");
-                } else {
-                    System.err.println("- The following direct dependencies violate the specification:");
-                    printNoDirectDependecyViolation(analysisResult.noStrictDependencyViolations);
-                }
-                if(error){
-                    System.exit(1);
-                }
-            } else {
-                AnalyserModel.LooseAnalysisResult analysisResult = analyser.analyseLoose(rootClassPath, definition);
-                System.out.println("- Analysis complete");
-                System.out.println("- Metrics: ");
-                printMetrics(analysisResult.metrics);
-                boolean error = !analysisResult.absentDependencyViolations.isEmpty() || !analysisResult.undesiredDependencyViolations.isEmpty();
-                if(analysisResult.absentDependencyViolations.isEmpty()) {
-                    System.out.println("- All dependencies specified exist");
-                } else {
-                    System.err.println("- The following dependencies do not exist:");
-                    printAbsentDependencies(analysisResult.absentDependencyViolations);
-                }
-                if(analysisResult.undesiredDependencyViolations.isEmpty()) {
-                    System.out.println("- No dependency violation detected");
-                } else {
-                    System.err.println("- The following dependencies violate the specification:");
-                    printUndesiredDependencies(analysisResult.undesiredDependencyViolations);
-                }
-                if(error){
-                    System.exit(1);
-                }
-            }
-        } catch(Exception e) {
-            System.err.println("Error during analysis: "+ e.getMessage());
+        return new CompoundClassPathRoot(classpathRoots);
+    }
+
+    private static void strictAnalysis(ModuleAnalyser analyser, Definition definition, ClasspathRoot classpathRoot) {
+        AnalyserModel.StrictAnalysisResult analysisResult = analyser.analyseStrict(classpathRoot, definition);
+        System.out.println("- Analysis complete");
+        System.out.println("- Metrics: ");
+        printMetrics(analysisResult.metrics);
+        boolean error = !analysisResult.dependencyViolations.isEmpty() || !analysisResult.noStrictDependencyViolations.isEmpty();
+        if(analysisResult.dependencyViolations.isEmpty()) {
+            System.out.println("- No dependency violation detected");
+        } else {
+            System.err.println("- The following dependencies violate the specification:");
+            printDependencyViolations(analysisResult.dependencyViolations);
+        }
+        if(analysisResult.noStrictDependencyViolations.isEmpty()) {
+            System.out.println("- No direct dependency violation detected");
+        } else {
+            System.err.println("- The following direct dependencies violate the specification:");
+            printNoDirectDependecyViolation(analysisResult.noStrictDependencyViolations);
+        }
+        if(error){
+            throw new CliException("");
+        }
+    }
+
+    private static void looseAnalysis(ModuleAnalyser analyser, Definition definition, ClasspathRoot classpathRoot){
+        AnalyserModel.LooseAnalysisResult analysisResult = analyser.analyseLoose(classpathRoot, definition);
+        System.out.println("- Analysis complete");
+        System.out.println("- Metrics: ");
+        printMetrics(analysisResult.metrics);
+        boolean error = !analysisResult.absentDependencyViolations.isEmpty() || !analysisResult.undesiredDependencyViolations.isEmpty();
+        if(analysisResult.absentDependencyViolations.isEmpty()) {
+            System.out.println("- All dependencies specified exist");
+        } else {
+            System.err.println("- The following dependencies do not exist:");
+            printAbsentDependencies(analysisResult.absentDependencyViolations);
+        }
+        if(analysisResult.undesiredDependencyViolations.isEmpty()) {
+            System.out.println("- No dependency violation detected");
+        } else {
+            System.err.println("- The following dependencies violate the specification:");
+            printUndesiredDependencies(analysisResult.undesiredDependencyViolations);
+        }
+        if(error){
+            throw new CliException("");
         }
     }
 
@@ -200,9 +176,7 @@ public class Main {
         try {
             return definitionParser.parse(new FileReader(specificationFile));
         } catch(IOException e) {
-            System.err.println("Error while parsing the specification file: "+ e.getMessage());
-            System.exit(1);
-            return null;
+            throw new CliException("Error while parsing the specification file: "+ e.getMessage());
         }
     }
 
