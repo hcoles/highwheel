@@ -425,7 +425,6 @@ public class ModuleGraphTransitiveClosureTest {
         final ModuleGraphTransitiveClosure otherTestee = new ModuleGraphTransitiveClosure(moduleGraph_2,modules_2);
         final List<ModuleGraphTransitiveClosure.PathDifference> differences = testee.diffPath(otherTestee).get();
 
-        System.out.println(differences);
         assertThat(differences.size()).isEqualTo(1);
 
         assertThat(differences.get(0).source).isEqualTo(MAIN);

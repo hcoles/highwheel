@@ -39,8 +39,9 @@
 		<module>highwheel-ant</module>
 		<module>highwheel-bytecode</module>
 		<module>highwheel-maven-verification</module>
-        <module>highwheel-modules</module>
-        <module>highwheel-utils</module>
+		<module>highwheel-modules</module>
+    <module>highwheel-utils</module>
+		<module>highwheel-modules-cli</module>
 	</modules>
 
 	<!-- common dependencies used in all subprojects -->
