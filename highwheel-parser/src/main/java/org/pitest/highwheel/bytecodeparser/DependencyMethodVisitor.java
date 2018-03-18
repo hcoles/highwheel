@@ -2,10 +2,7 @@ package org.pitest.highwheel.bytecodeparser;
 
 import static org.pitest.highwheel.bytecodeparser.NameUtil.getElementNameForType;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.model.AccessPoint;
 import org.pitest.highwheel.model.AccessPointName;
@@ -70,5 +67,12 @@ class DependencyMethodVisitor extends MethodVisitor {
       .apply(this.parent, AccessPoint.create(element),
           AccessType.USES);
     }
+  }
+
+  @Override
+  public void visitLocalVariable(String name, String desc, String signature,
+                                 Label start, Label end, int index) {
+    final ElementName element = ElementName.fromString(org.objectweb.asm.Type.getType(desc).getClassName());
+    this.typeReceiver.apply(this.parent,AccessPoint.create(element),AccessType.USES);
   }
 }

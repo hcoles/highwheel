@@ -3,11 +3,11 @@ package org.pitest.highwheel.modules.model.rules;
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.util.validation.Objects;
 
-public class NoDirectDependency implements Rule {
+public class NoStrictDependency implements Rule {
     public final Module source;
     public final Module dest;
 
-    public NoDirectDependency(Module source, Module dest) {
+    public NoStrictDependency(Module source, Module dest) {
         this.source = source;
         this.dest = dest;
     }
@@ -22,7 +22,7 @@ public class NoDirectDependency implements Rule {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NoDirectDependency that = (NoDirectDependency) o;
+        NoStrictDependency that = (NoStrictDependency) o;
 
         return Objects.equals(this.source,that.source) &&
                 Objects.equals(this.dest,that.dest);

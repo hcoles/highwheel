@@ -3,11 +3,12 @@ package org.pitest.highwheel.modules.specification;
 import org.pitest.highwheel.modules.model.Definition;
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.rules.Dependency;
-import org.pitest.highwheel.modules.model.rules.NoDirectDependency;
-import org.pitest.highwheel.modules.model.rules.Rule;
+import org.pitest.highwheel.modules.model.rules.NoStrictDependency;
 import org.pitest.highwheel.util.base.Optional;
 
 import java.util.*;
+
+import static org.pitest.highwheel.util.StringUtil.join;
 
 public class Compiler {
 
@@ -27,7 +28,7 @@ public class Compiler {
 
     public Definition compile(SyntaxTree.Definition definition) {
         final Map<String,Module> modules = compileModules(definition.moduleDefinitions);
-        final Pair<List<Dependency>,List<NoDirectDependency>> rules = compileRules(definition.rules,modules);
+        final Pair<List<Dependency>,List<NoStrictDependency>> rules = compileRules(definition.rules,modules);
 
         return new Definition(modules.values(),rules.first,rules.second);
     }
@@ -49,9 +50,9 @@ public class Compiler {
         return modules;
     }
 
-    private Pair<List<Dependency>,List<NoDirectDependency>> compileRules(List<SyntaxTree.Rule> rulesDefinition, Map<String, Module> modules) {
+    private Pair<List<Dependency>,List<NoStrictDependency>> compileRules(List<SyntaxTree.Rule> rulesDefinition, Map<String, Module> modules) {
         final List<Dependency> dependencies = new ArrayList<Dependency>();
-        final List<NoDirectDependency> noDirectDependencies = new ArrayList<NoDirectDependency>();
+        final List<NoStrictDependency> noDirectDependencies = new ArrayList<NoStrictDependency>();
         for(SyntaxTree.Rule ruleDefinition: rulesDefinition) {
             if(ruleDefinition instanceof SyntaxTree.ChainDependencyRule) {
                 SyntaxTree.ChainDependencyRule chainDependencyRule = (SyntaxTree.ChainDependencyRule) ruleDefinition;
@@ -61,7 +62,7 @@ public class Compiler {
                 noDirectDependencies.add(compileNoDependency(noDependentRule,modules));
             }
         }
-        return new Pair<List<Dependency>,List<NoDirectDependency>>(dependencies,noDirectDependencies);
+        return new Pair<List<Dependency>,List<NoStrictDependency>>(dependencies,noDirectDependencies);
     }
 
     private List<Dependency> compileChainDependencies(List<String> chainDependencies, Map<String,Module> modules) {
@@ -80,23 +81,13 @@ public class Compiler {
         return result;
     }
 
-    private NoDirectDependency compileNoDependency(SyntaxTree.NoDependentRule noDependentRule, Map<String,Module> modules) {
+    private NoStrictDependency compileNoDependency(SyntaxTree.NoDependentRule noDependentRule, Map<String,Module> modules) {
         if(modules.get(noDependentRule.left) == null) {
             throw new CompilerException(String.format(MODULE_HAS_NOT_BEEN_DEFINED, noDependentRule.left, join(" -/-> ", Arrays.asList(noDependentRule.left,noDependentRule.right))));
         } else if(modules.get(noDependentRule.right) == null) {
             throw new CompilerException(String.format(MODULE_HAS_NOT_BEEN_DEFINED, noDependentRule.right, join(" -/-> ", Arrays.asList(noDependentRule.left,noDependentRule.right))));
         } else {
-            return new NoDirectDependency(modules.get(noDependentRule.left),modules.get(noDependentRule.right));
+            return new NoStrictDependency(modules.get(noDependentRule.left),modules.get(noDependentRule.right));
         }
-    }
-
-    private static <T> String join(String separator, Iterable<T> iterable) {
-        final StringBuilder buff = new StringBuilder("");
-        String sep = "";
-        for(T item : iterable) {
-            buff.append(sep).append(item.toString());
-            sep = separator;
-        }
-        return buff.toString();
     }
 }

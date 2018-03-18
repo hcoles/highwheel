@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.pitest.highwheel.modules.model.Definition;
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.rules.Dependency;
-import org.pitest.highwheel.modules.model.rules.NoDirectDependency;
+import org.pitest.highwheel.modules.model.rules.NoStrictDependency;
 
 import java.util.Arrays;
 
@@ -85,6 +85,6 @@ public class CompilerTest {
                 ),
                 Arrays.<SyntaxTree.Rule>asList(new SyntaxTree.NoDependentRule("core","io")));
         Definition actual = testee.compile(definition);
-        assertThat(actual.noDirectDependencies).containsAll(Arrays.asList(new NoDirectDependency(CORE,IO)));
+        assertThat(actual.noStrictDependencies).containsAll(Arrays.asList(new NoStrictDependency(CORE,IO)));
     }
 }
