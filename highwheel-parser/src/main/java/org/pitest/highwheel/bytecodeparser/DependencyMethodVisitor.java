@@ -17,7 +17,7 @@ class DependencyMethodVisitor extends MethodVisitor {
 
   public DependencyMethodVisitor(final AccessPoint owner,
       final AccessVisitor typeReceiver, NameTransformer nameTransformer) {
-    super(Opcodes.ASM5, null);
+    super(Opcodes.ASM6, null);
     this.typeReceiver = typeReceiver;
     this.parent = owner;
     this.nameTransformer = nameTransformer;
@@ -30,6 +30,17 @@ class DependencyMethodVisitor extends MethodVisitor {
         .apply(this.parent, AccessPoint.create(
             nameTransformer.transform(owner), AccessPointName.create(name, desc)),
             AccessType.USES);
+  }
+
+  @Override
+  public void visitInvokeDynamicInsn(String name, String descriptor, Handle bootstrapMethodHandle, Object... bootstrapMethodArguments) {
+    final org.objectweb.asm.Type method = org.objectweb.asm.Type.getMethodType(descriptor);
+
+    for(Type type : method.getArgumentTypes()) {
+      this.typeReceiver.apply(this.parent,AccessPoint.create(nameTransformer.transform(type.getClassName())),AccessType.USES);
+    }
+
+    this.typeReceiver.apply(this.parent,AccessPoint.create(nameTransformer.transform(method.getReturnType().getClassName())),AccessType.USES);
   }
 
   @Override
