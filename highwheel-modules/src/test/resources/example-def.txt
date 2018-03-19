@@ -1,5 +1,5 @@
 modules:
-    Core = "com.pitest.highwheel.core.*"
+    Core = "com.pitest.highwheel.core.*" , "com.pitest.highwheel.core2.*"
     Utils = "com.pitest.highwheel.utils.*"
     Modules = "com.pitest.highwheel.modules.*"
     Parser = "com.pitest.highwheel.parser.*"

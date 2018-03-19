@@ -14,9 +14,16 @@ public final class DefinitionParser {
 
     final TerminalParser tp = new TerminalParser();
 
+    private final Parser<String> commaRegex = Parsers.sequence(tp.comma(),tp.moduleRegex(), (Token t, String s) -> s);
+
     final Parser<SyntaxTree.ModuleDefinition> moduleDefinitionParser =
-            Parsers.sequence(tp.moduleName(), tp.equals(), tp.moduleRegex(), tp.newLine(),
-                (String s, Token token, String s2, Token token2) -> new SyntaxTree.ModuleDefinition(s,s2));
+            Parsers.sequence(tp.moduleName(), tp.equals(), tp.moduleRegex(), commaRegex.many() , tp.newLine(),
+                (String s, Token token, String s2, List<String> list, Token token2) -> {
+              final List<String> result = new ArrayList<>(list.size()+1);
+              result.add(s2);
+              result.addAll(list);
+              return new SyntaxTree.ModuleDefinition(s,result);
+            });
 
     final Parser<SyntaxTree.ChainDependencyRule> chainDependencyRuleParser =
             Parsers.sequence(tp.moduleName(), Parsers.sequence(tp.arrow(), tp.moduleName(),(Token t,String s) -> s).many1(), tp.newLine(),

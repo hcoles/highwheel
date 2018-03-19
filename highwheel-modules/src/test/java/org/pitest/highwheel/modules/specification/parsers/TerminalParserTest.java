@@ -18,11 +18,12 @@ public class TerminalParserTest {
         parser.parse("-/->");
         parser.parse("\n");
         parser.parse(":");
+        parser.parse(",");
     }
 
     @Test
     public void shouldNotTokeniseOtherSpecialCharacters() {
-        final String[] otherSpecial = new String[] {">", "<->", ".", ",", ";"};
+        final String[] otherSpecial = new String[] {">", "<->", ".", ";"};
         for(String other: otherSpecial) {
             boolean exceptionThrown = false;
             try {
@@ -56,6 +57,11 @@ public class TerminalParserTest {
     @Test
     public void equalsShouldParseEqual() {
         assertParse(testee.equals(),"=");
+    }
+
+    @Test
+    public void commaShouldParseComma() {
+        assertParse(testee.comma(),",");
     }
 
     @Test

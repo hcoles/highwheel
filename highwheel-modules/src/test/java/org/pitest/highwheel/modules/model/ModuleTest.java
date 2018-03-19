@@ -26,6 +26,18 @@ public class ModuleTest {
     }
 
     @Test
+    public void containsShouldBeTrueOnMultiPatternModule() {
+        Module testee = Module.make("a module with two patterns","a*","b*").get();
+        assertThat(testee.contains(new ElementName("afoo"))).isTrue();
+        assertThat(testee.contains(new ElementName("bfoo"))).isTrue();
+    }
+
+    @Test
+    public void containsShouldFailIfAnyPatternFails() {
+      assertThat(Module.make("a module", "valid","[invalid").isPresent()).isFalse();
+    }
+
+    @Test
     public void containsShouldBeFalseIfElementNameDoesNotMatchPattern() {
         assertThat(testee.contains(new ElementName("not.pitest.foo"))).isFalse();
     }

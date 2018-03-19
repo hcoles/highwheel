@@ -3,7 +3,7 @@ modules:
     Controller = "org.example.controller.*"
     Facade = "org.example.core.CoreFacade"
     CoreInternals = "org.example.core.internals.*"
-    CoreApi = "org.example.core.api.*"
+    CoreApi = "org.example.core.api.*", "org.example.core.otherapi.*"
     Model = "org.example.core.model.*"
     IO = "org.example.io.*"
     Utils = "org.example.commons.*"
@@ -17,7 +17,7 @@ rules:
     Controller -> Facade
     CoreInternals -> Model
     CoreInternals -> Utils
-    Facade -> CoreInternals
+    Facade -> CoreInternals -> CoreApi
     Facade -> CoreApi
     Facade -> Model
     CoreApi -> Model

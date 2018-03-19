@@ -3,11 +3,8 @@ package org.pitest.highwheel.modules.specification.parsers;
 import org.jparsec.Parser;
 import org.jparsec.Parsers;
 import org.junit.Test;
-import org.pitest.highwheel.model.Dependency;
 import org.pitest.highwheel.modules.specification.SyntaxTree;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
@@ -34,6 +31,22 @@ public class DefinitionParserTest {
     @Test(expected = RuntimeException.class)
     public void moduleDefinitionParserShouldFailOnMalformedIdentifierEqual() {
         assertParse(testee.moduleDefinitionParser,"111module=\"regex\"\n", null);
+    }
+
+    @Test
+    public void moduleDefinitionParserShouldParseMultipleRegex() {
+        assertParse(testee.moduleDefinitionParser,"module=\"regex\",\"regex2\"\n",
+            new SyntaxTree.ModuleDefinition("module",Arrays.asList("regex","regex2")));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void moduleDefinitionParserShouldFailOnCommaMissingRegex() {
+        assertParse(testee.moduleDefinitionParser,"module=\"regex\",\n", null);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void moduleDefinitionParserShouldFailOnMissingRegexComma() {
+        assertParse(testee.moduleDefinitionParser,"module=,\"regex\"\n", null);
     }
 
     @Test(expected = RuntimeException.class)
@@ -169,7 +182,7 @@ public class DefinitionParserTest {
         final InputStreamReader reader = new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("./example-def.txt"));
         assertThat(testee.parse(reader)).isEqualTo(new SyntaxTree.Definition(
                 Arrays.asList(
-                        new SyntaxTree.ModuleDefinition("Core","com.pitest.highwheel.core.*"),
+                        new SyntaxTree.ModuleDefinition("Core",Arrays.asList("com.pitest.highwheel.core.*" , "com.pitest.highwheel.core2.*")),
                         new SyntaxTree.ModuleDefinition("Utils", "com.pitest.highwheel.utils.*"),
                         new SyntaxTree.ModuleDefinition("Modules", "com.pitest.highwheel.modules.*"),
                         new SyntaxTree.ModuleDefinition("Parser","com.pitest.highwheel.parser.*")

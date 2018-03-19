@@ -5,7 +5,7 @@ import org.jparsec.*;
 
 final class TerminalParser {
     private final String[] operators = {
-            "=","\n",":","->","-/->"
+            "=","\n",":","->","-/->",","
     };
 
     private final Terminals terminals = Terminals.operators(operators).words(Scanners.IDENTIFIER).keywords("modules","rules").build();
@@ -20,6 +20,9 @@ final class TerminalParser {
     public Parser<Token> equals() {
         return this.equals;
     }
+
+    private final Parser<Token> comma = term(",");
+    public Parser<Token> comma() {return comma;}
 
     private final Parser<Token> arrow = term("->");
     public Parser<Token> arrow(){

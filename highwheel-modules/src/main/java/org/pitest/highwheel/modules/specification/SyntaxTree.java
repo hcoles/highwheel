@@ -1,6 +1,7 @@
 package org.pitest.highwheel.modules.specification;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -8,11 +9,16 @@ public interface SyntaxTree {
 
     final class ModuleDefinition {
         public final String moduleName;
-        public final String moduleRegex;
+        public final List<String> moduleRegex;
 
         public ModuleDefinition(String moduleName, String moduleRegex) {
             this.moduleName = moduleName;
-            this.moduleRegex = moduleRegex;
+            this.moduleRegex = Collections.singletonList(moduleRegex);
+        }
+
+        public ModuleDefinition(String moduleName, List<String> moduleRegexs) {
+            this.moduleName = moduleName;
+            this.moduleRegex = moduleRegexs;
         }
 
         @Override
