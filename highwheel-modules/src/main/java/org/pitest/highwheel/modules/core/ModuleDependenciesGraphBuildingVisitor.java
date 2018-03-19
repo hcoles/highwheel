@@ -22,18 +22,22 @@ public class ModuleDependenciesGraphBuildingVisitor implements AccessVisitor {
     private final Collection<Module> modules;
     private final ModuleGraph graph;
     private final WarningsCollector warningsCollector;
+    private final Module other;
 
     public ModuleDependenciesGraphBuildingVisitor(
             final Collection<Module> modules,
             final ModuleGraph graph,
+            final Module other,
             final WarningsCollector warningsCollector) {
         this. modules = modules;
         this.graph = graph;
         this.warningsCollector = warningsCollector;
+        this.other = other;
         addModulesToGraph();
     }
 
     private void addModulesToGraph() {
+      graph.addModule(other);
         final Set<String> processedModuleNames = new HashSet<String>(modules.size());
         for(Module module: modules) {
             graph.addModule(module);
@@ -44,8 +48,8 @@ public class ModuleDependenciesGraphBuildingVisitor implements AccessVisitor {
         }
     }
 
-    public ModuleDependenciesGraphBuildingVisitor(final Collection<Module> modules, final ModuleGraph graph) {
-        this(modules,graph, new NoOpWarningsCollector());
+    public ModuleDependenciesGraphBuildingVisitor(final Collection<Module> modules, final ModuleGraph graph, final Module other) {
+        this(modules,graph,other, new NoOpWarningsCollector());
     }
 
     @Override
@@ -58,6 +62,18 @@ public class ModuleDependenciesGraphBuildingVisitor implements AccessVisitor {
                 if(!sourceModule.equals(destModule))
                     graph.addDependency(sourceModule,destModule);
             }
+        }
+
+        if(modulesMatchingSource.isEmpty() && ! moduleMatchingDest.isEmpty()) {
+          for(Module destModule: moduleMatchingDest) {
+            graph.addDependency(other,destModule);
+          }
+        }
+
+        if(!modulesMatchingSource.isEmpty() && moduleMatchingDest.isEmpty()) {
+          for(Module sourceModule: modulesMatchingSource) {
+            graph.addDependency(sourceModule,other);
+          }
         }
     }
 

@@ -143,8 +143,8 @@ public class Main {
             System.err.println(String.format("  - %s -> %s. Expected path: %s, Actual path: %s",
                     violation.sourceModule,
                     violation.destinationModule,
-                    violation.sourceModule + " -> " + join(" -> ", violation.specificationPath),
-                    violation.sourceModule + " -> " + join(" -> ", violation.actualPath)));
+                violation.specificationPath.isEmpty() ? "(empty)" : violation.sourceModule + " -> " + join(" -> ", violation.specificationPath),
+                violation.actualPath.isEmpty() ? "(empty)" : violation.sourceModule + " -> " + join(" -> ", violation.actualPath)));
         }
     }
 
@@ -167,7 +167,7 @@ public class Main {
             System.err.println(String.format("  - %s -/-> %s. Actual dependency path: %s",
                     violation.sourceModule,
                     violation.destinationModule,
-                    violation.sourceModule + " -> " + join(" -> ", violation.evidence)));
+                violation.evidence.isEmpty() ? "(empty)" : violation.sourceModule + " -> " + join(" -> ", violation.evidence)));
         }
     }
 

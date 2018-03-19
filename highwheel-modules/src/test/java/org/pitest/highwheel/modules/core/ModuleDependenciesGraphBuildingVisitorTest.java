@@ -20,6 +20,7 @@ public class ModuleDependenciesGraphBuildingVisitorTest {
     private final Module COMMONS = Module.make("Commons", "org.example.commons.*").get();
     private final Module ENDPOINTS = Module.make("Endpoints", "org.example.endpoints.*").get();
     private final Module MAIN = Module.make("Main","org.example.Main").get();
+    private final Module OTHER = Module.make("Other","").get();
 
     private final List<Module> modules = Arrays.asList(CORE,IO,COMMONS,ENDPOINTS,MAIN);
 
@@ -54,12 +55,15 @@ public class ModuleDependenciesGraphBuildingVisitorTest {
     private final DirectedSparseGraph<Module,ModuleDependency> graph = new DirectedSparseGraph<Module, ModuleDependency>();
     private final JungModuleGraph moduleGraph = new JungModuleGraph(graph);
     private final WarningsCollector warningsCollector = new AddToListWarnings();
-    private final ModuleDependenciesGraphBuildingVisitor testee = new ModuleDependenciesGraphBuildingVisitor(modules,moduleGraph);
+    private final ModuleDependenciesGraphBuildingVisitor testee = new ModuleDependenciesGraphBuildingVisitor(modules,moduleGraph,OTHER);
 
     @Test
     public void constructorShouldAddAllModulesToTheModuleGraph() {
-        assertThat(graph.getVertices().containsAll(modules)).isTrue();
-        assertThat(modules.containsAll(graph.getVertices())).isTrue();
+        final List<Module> allModules = new ArrayList<>(modules.size()+1);
+        allModules.addAll(modules);
+        allModules.add(OTHER);
+        assertThat(graph.getVertices().containsAll(allModules)).isTrue();
+        assertThat(allModules.containsAll(graph.getVertices())).isTrue();
     }
 
     @Test
@@ -71,7 +75,7 @@ public class ModuleDependenciesGraphBuildingVisitorTest {
         final DirectedSparseGraph<Module,ModuleDependency> graph = new DirectedSparseGraph<Module, ModuleDependency>();
         final JungModuleGraph moduleGraph = new JungModuleGraph(graph);
         final WarningsCollector warningsCollector = new AddToListWarnings();
-        new ModuleDependenciesGraphBuildingVisitor(repeatedModules,moduleGraph,warningsCollector);
+        new ModuleDependenciesGraphBuildingVisitor(repeatedModules,moduleGraph,OTHER,warningsCollector);
 
         assertThat(constructionWarnings.size()).isEqualTo(1);
         assertThat(constructionWarnings.get(0).name).isEqualTo("Core");
@@ -99,8 +103,22 @@ public class ModuleDependenciesGraphBuildingVisitorTest {
         final Optional<ModuleDependency> moduleDependency = moduleGraph.findDependency(CORE,IO);
 
         assertThat(moduleDependency.isPresent()).isFalse();
-        assertThat(graph.getEdges().isEmpty()).isTrue();
     }
+
+  @Test
+  public void applyShouldConnectUnmatchingElementsToOther() {
+    final AccessPoint source = AccessPoint.create(ElementName.fromString("NOTORG.example.core.Service"));
+    final AccessPoint dest = AccessPoint.create(ElementName.fromString("org.example.io.FileReader"));
+
+    testee.apply(source,dest,null);
+    testee.apply(dest,source,null);
+
+    final Optional<ModuleDependency> moduleDependency1 = moduleGraph.findDependency(OTHER,IO);
+    final Optional<ModuleDependency> moduleDependency2 = moduleGraph.findDependency(IO,OTHER);
+
+    assertThat(moduleDependency1.isPresent()).isTrue();
+    assertThat(moduleDependency2.isPresent()).isTrue();
+  }
 
     @Test
     public void applyShouldNotAddSelfDependencies() {
@@ -114,6 +132,18 @@ public class ModuleDependenciesGraphBuildingVisitorTest {
         assertThat(moduleDependency.isPresent()).isFalse();
     }
 
+  @Test
+  public void applyShouldNotAddSelfDependencyToOther() {
+    final AccessPoint source = AccessPoint.create(ElementName.fromString("NOTORG.example.core.Service"));
+    final AccessPoint dest = AccessPoint.create(ElementName.fromString("NOTORG.example.core.FileReader"));
+
+    testee.apply(source,dest,null);
+
+    final Optional<ModuleDependency> moduleDependency = moduleGraph.findDependency(OTHER,OTHER);
+
+    assertThat(moduleDependency.isPresent()).isFalse();
+  }
+
     @Test
     public void applyShouldAddSourceAndDestToMoreModulesIfMoreModuleGlobRegexMatch() {
         final List<Module> repeatedModules = Arrays.asList(
@@ -123,7 +153,7 @@ public class ModuleDependenciesGraphBuildingVisitorTest {
         );
         final DirectedSparseGraph<Module,ModuleDependency> graph = new DirectedSparseGraph<Module, ModuleDependency>();
         final JungModuleGraph moduleGraph = new JungModuleGraph(graph);
-        final ModuleDependenciesGraphBuildingVisitor testee = new ModuleDependenciesGraphBuildingVisitor(repeatedModules,moduleGraph);
+        final ModuleDependenciesGraphBuildingVisitor testee = new ModuleDependenciesGraphBuildingVisitor(repeatedModules,moduleGraph,OTHER);
 
         final AccessPoint source = AccessPoint.create(ElementName.fromString("org.example.core.Service"));
         final AccessPoint dest = AccessPoint.create(ElementName.fromString("org.example.io.Component"));
@@ -149,7 +179,7 @@ public class ModuleDependenciesGraphBuildingVisitorTest {
         );
         final DirectedSparseGraph<Module,ModuleDependency> graph = new DirectedSparseGraph<Module, ModuleDependency>();
         final JungModuleGraph moduleGraph = new JungModuleGraph(graph);
-        final ModuleDependenciesGraphBuildingVisitor testee = new ModuleDependenciesGraphBuildingVisitor(repeatedModules,moduleGraph, warningsCollector);
+        final ModuleDependenciesGraphBuildingVisitor testee = new ModuleDependenciesGraphBuildingVisitor(repeatedModules,moduleGraph, OTHER, warningsCollector);
 
         final AccessPoint source = AccessPoint.create(ElementName.fromString("org.example.core.Service"));
         final AccessPoint dest = AccessPoint.create(ElementName.fromString("org.example.io.Component"));
