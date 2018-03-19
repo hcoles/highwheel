@@ -1,8 +1,8 @@
 package org.pitest.highwheel.modules.specification.parsers;
 
-import org.codehaus.jparsec.Parser;
-import org.codehaus.jparsec.Parsers;
-import org.codehaus.jparsec.Token;
+
+import org.jparsec.Parser;
+import org.jparsec.Parsers;
 import org.junit.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;

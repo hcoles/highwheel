@@ -1,6 +1,7 @@
 package org.pitest.highwheel.modules.specification.parsers;
 
-import org.codehaus.jparsec.*;
+
+import org.jparsec.*;
 
 final class TerminalParser {
     private final String[] operators = {

@@ -1,7 +1,7 @@
 package org.pitest.highwheel.modules.specification.parsers;
 
-import org.codehaus.jparsec.Parser;
-import org.codehaus.jparsec.Parsers;
+import org.jparsec.Parser;
+import org.jparsec.Parsers;
 import org.junit.Test;
 import org.pitest.highwheel.model.Dependency;
 import org.pitest.highwheel.modules.specification.SyntaxTree;

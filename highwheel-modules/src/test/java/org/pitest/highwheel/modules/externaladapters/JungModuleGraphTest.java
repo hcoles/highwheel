@@ -5,7 +5,8 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import org.junit.Test;
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.ModuleDependency;
-import org.pitest.highwheel.util.base.Optional;
+
+import java.util.Optional;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

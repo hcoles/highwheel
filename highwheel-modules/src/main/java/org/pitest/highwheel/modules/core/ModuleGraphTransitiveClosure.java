@@ -2,8 +2,6 @@ package org.pitest.highwheel.modules.core;
 
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.ModuleGraph;
-import org.pitest.highwheel.util.base.Function;
-import org.pitest.highwheel.util.base.Optional;
 
 import java.util.*;
 
@@ -127,36 +125,22 @@ public class ModuleGraphTransitiveClosure {
     }
 
     public Boolean isReachable(Module vertex1, Module vertex2) {
-        final Function<Integer,Boolean> smallerThanMaxInt = new Function<Integer, Boolean>() {
-            @Override
-            public Boolean apply(Integer argument) {
-                return argument < Integer.MAX_VALUE;
-            }
-        };
-        return minimumDistance(vertex1,vertex2).map(smallerThanMaxInt).orElse(false);
+        return minimumDistance(vertex1,vertex2).map((a) -> a < Integer.MAX_VALUE).orElse(false);
     }
 
     public boolean same(ModuleGraphTransitiveClosure other) {
-        final Function<List<Difference>,Boolean> emptyList = new Function<List<Difference>, Boolean>() {
-            @Override
-            public Boolean apply(List<Difference> argument) {
-                return argument.isEmpty();
-            }
-        };
-        return diff(other).map(emptyList).orElse(false);
+        return diff(other).map(List::isEmpty).orElse(false);
     }
 
     public Optional<List<Difference>> diff(ModuleGraphTransitiveClosure other) {
-        return diffPath(other).map(new Function<List<PathDifference>, List<Difference>>() {
-            @Override
-            public List<Difference> apply(List<PathDifference> argument) {
+        return diffPath(other).map((argument) -> {
                 final List<Difference> result = new ArrayList<Difference>(argument.size());
                 for(PathDifference pathDifference: argument) {
                     result.add(new Difference(pathDifference.source,pathDifference.dest,pathDifference.firstPath.size(),pathDifference.secondPath.size()));
                 }
                 return result;
             }
-        });
+        );
     }
 
     public Optional<List<PathDifference>> diffPath(ModuleGraphTransitiveClosure other) {

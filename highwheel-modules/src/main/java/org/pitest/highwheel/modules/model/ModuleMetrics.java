@@ -1,6 +1,6 @@
 package org.pitest.highwheel.modules.model;
 
-import org.pitest.highwheel.util.base.Optional;
+import java.util.Optional;
 
 public interface ModuleMetrics {
     Optional<Integer> fanInOf(Module module);

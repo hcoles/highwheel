@@ -1,8 +1,7 @@
 package org.pitest.highwheel.modules.model;
 
-import org.pitest.highwheel.util.base.Optional;
-
 import java.util.Collection;
+import java.util.Optional;
 
 public interface ModuleGraph {
     Optional<ModuleDependency> findDependency(Module vertex1, Module vertex2);

@@ -4,7 +4,6 @@ import org.pitest.highwheel.modules.model.Definition;
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.rules.Dependency;
 import org.pitest.highwheel.modules.model.rules.NoStrictDependency;
-import org.pitest.highwheel.util.base.Optional;
 
 import java.util.*;
 
@@ -62,7 +61,7 @@ public class Compiler {
                 noDirectDependencies.add(compileNoDependency(noDependentRule,modules));
             }
         }
-        return new Pair<List<Dependency>,List<NoStrictDependency>>(dependencies,noDirectDependencies);
+        return new Pair<>(dependencies,noDirectDependencies);
     }
 
     private List<Dependency> compileChainDependencies(List<String> chainDependencies, Map<String,Module> modules) {

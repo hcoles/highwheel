@@ -2,9 +2,9 @@ package org.pitest.highwheel.modules.model;
 
 import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.util.GlobToRegex;
-import org.pitest.highwheel.util.base.Optional;
 import org.pitest.highwheel.util.validation.Objects;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 

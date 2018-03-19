@@ -7,12 +7,8 @@ import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.modules.externaladapters.JungModuleGraph;
 import org.pitest.highwheel.modules.model.Module;
 import org.pitest.highwheel.modules.model.ModuleDependency;
-import org.pitest.highwheel.util.base.Optional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
