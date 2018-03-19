@@ -1,9 +1,8 @@
 package org.pitest.highwheel.modules.specification;
 
-import org.pitest.highwheel.util.validation.Objects;
-
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public interface SyntaxTree {
 

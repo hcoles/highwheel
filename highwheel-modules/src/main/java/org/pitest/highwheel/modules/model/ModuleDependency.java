@@ -1,6 +1,7 @@
 package org.pitest.highwheel.modules.model;
 
-import org.pitest.highwheel.util.validation.Objects;
+
+import java.util.Objects;
 
 public final class ModuleDependency {
 

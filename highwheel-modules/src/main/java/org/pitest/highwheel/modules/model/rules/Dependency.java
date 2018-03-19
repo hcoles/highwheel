@@ -1,7 +1,8 @@
 package org.pitest.highwheel.modules.model.rules;
 
 import org.pitest.highwheel.modules.model.Module;
-import org.pitest.highwheel.util.validation.Objects;
+
+import java.util.Objects;
 
 public class Dependency implements Rule {
     public final Module source;

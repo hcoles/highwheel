@@ -1,9 +1,8 @@
 package org.pitest.highwheel.modules;
 
-import org.pitest.highwheel.util.validation.Objects;
-
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static org.pitest.highwheel.util.StringUtil.join;
 
