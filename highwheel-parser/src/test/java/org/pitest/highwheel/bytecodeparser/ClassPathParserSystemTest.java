@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import com.example.*;
 import org.junit.Before;
@@ -278,6 +279,13 @@ public class ClassPathParserSystemTest {
     parseClassPath(UsesAnInterfaceInMethod.class);
     verify(this.v).apply(access(UsesAnInterfaceInMethod.class,method("foo","()V")),accessAType(AnInterface.class),AccessType.USES);
   }
+
+  @Test
+  public void shouldDetectUsageOfMethodReference() {
+    parseClassPath(UsesMethodReference.class);
+    verify(this.v).apply(access(UsesMethodReference.class,method("foo","()V")),access(Foo.class,method("aMethod","()Ljava/lang/Object;")),AccessType.USES);
+  }
+
 
   private Filter matchOnlyExampleDotCom() {
     return new Filter() {
