@@ -1,8 +1,8 @@
 package org.pitest.highwheel.modules.cli;
 
 import org.apache.commons.cli.*;
+import org.pitest.highwheel.modules.AnalyserFacade;
 
-import java.io.File;
 import java.util.List;
 
 public class CmdParser {
@@ -21,8 +21,8 @@ public class CmdParser {
             .hasArg(true)
             .desc("Mode of analysis. Can be 'strict' or 'loose'").build();
 
-    public final ExecutionMode mode;
-    public final File specificationFile;
+    public final AnalyserFacade.ExecutionMode mode;
+    public final String specificationFile;
     public final List<String> argList;
 
     public CmdParser(String[] argv) {
@@ -42,16 +42,11 @@ public class CmdParser {
         }
 
         if(operationMode.equals(STRICT)) {
-            this.mode = ExecutionMode.STRICT;
+            this.mode = AnalyserFacade.ExecutionMode.STRICT;
         } else {
-            this.mode = ExecutionMode.LOOSE;
+            this.mode = AnalyserFacade.ExecutionMode.LOOSE;
         }
-
-        final File f = new File(specificationPath);
-        if(!f.exists() || f.isDirectory() || !f.canRead()) {
-            throw new CliException(String.format("Cannot read from specification file '%s'.", specificationPath));
-        }
-        specificationFile = f;
+        specificationFile = specificationPath;
         argList = cmd.getArgList();
     }
 }

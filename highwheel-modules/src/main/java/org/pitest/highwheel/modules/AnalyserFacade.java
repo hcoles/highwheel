@@ -7,7 +7,6 @@ import org.pitest.highwheel.bytecodeparser.classpath.DirectoryClassPathRoot;
 import org.pitest.highwheel.classpath.ClassParser;
 import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.cycles.Filter;
-import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.modules.model.Definition;
 import org.pitest.highwheel.modules.specification.Compiler;
 import org.pitest.highwheel.modules.specification.SyntaxTree;
@@ -24,12 +23,7 @@ import static org.pitest.highwheel.util.StringUtil.join;
 
 public class AnalyserFacade {
 
-  private static Filter includeAll = new Filter() {
-    @Override
-    public boolean include(ElementName item) {
-      return true;
-    }
-  };
+  private static Filter includeAll = (item) -> true;
 
   public enum ExecutionMode {
     STRICT, LOOSE
