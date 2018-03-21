@@ -1,29 +1,6 @@
 package org.pitest.highwheel.modules.cli;
 
-import org.pitest.highwheel.bytecodeparser.ClassPathParser;
-import org.pitest.highwheel.bytecodeparser.classpath.ArchiveClassPathRoot;
-import org.pitest.highwheel.bytecodeparser.classpath.CompoundClassPathRoot;
-import org.pitest.highwheel.bytecodeparser.classpath.DirectoryClassPathRoot;
-import org.pitest.highwheel.classpath.ClassParser;
-import org.pitest.highwheel.classpath.ClasspathRoot;
-import org.pitest.highwheel.cycles.Filter;
-import org.pitest.highwheel.model.ElementName;
 import org.pitest.highwheel.modules.AnalyserFacade;
-import org.pitest.highwheel.modules.AnalyserModel;
-import org.pitest.highwheel.modules.ModuleAnalyser;
-import org.pitest.highwheel.modules.model.Definition;
-import org.pitest.highwheel.modules.specification.Compiler;
-import org.pitest.highwheel.modules.specification.SyntaxTree;
-import org.pitest.highwheel.modules.specification.parsers.DefinitionParser;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static org.pitest.highwheel.util.StringUtil.join;
 
 public class Main {
 
