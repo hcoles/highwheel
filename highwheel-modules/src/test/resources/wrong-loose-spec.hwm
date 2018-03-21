@@ -14,6 +14,6 @@ rules:
     Facade -> CoreInternals -> Model
     CoreApi -> Model
     IO -> CoreApi
-    IO -> Model
-    IO -/-> CoreInternals
+    IO -/-> Model // WRONG
+    IO -> CoreInternals // WRONG
     Utils -/-> Main

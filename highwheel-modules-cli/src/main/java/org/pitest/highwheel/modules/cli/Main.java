@@ -1,6 +1,5 @@
 package org.pitest.highwheel.modules.cli;
 
-import org.apache.commons.cli.*;
 import org.pitest.highwheel.bytecodeparser.ClassPathParser;
 import org.pitest.highwheel.bytecodeparser.classpath.ArchiveClassPathRoot;
 import org.pitest.highwheel.bytecodeparser.classpath.CompoundClassPathRoot;

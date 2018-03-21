@@ -23,6 +23,6 @@ rules:
     CoreApi -> Model
     IO -> CoreApi
     IO -> Model
-//    IO -> Utils
+//    IO -> Utils WRONG
     IO -/-> CoreInternals
-    Facade -/-> CoreInternals
+    Facade -/-> CoreInternals // WRONG
