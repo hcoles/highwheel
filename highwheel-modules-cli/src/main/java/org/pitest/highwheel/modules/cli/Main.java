@@ -33,6 +33,11 @@ public class Main {
         public void error(String msg) {
             System.err.println(" - " + msg);
         }
+
+      @Override
+      public void warning(String msg) {
+        this.info(msg);
+      }
     }
 
     public static void main(String[] argv) {

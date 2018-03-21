@@ -34,6 +34,7 @@ public class AnalyserFacade {
     void info(String msg);
     void error(String msg, int indentation);
     void error(String msg);
+    void warning(String msg);
   }
 
   private final Printer printer;
@@ -81,7 +82,7 @@ public class AnalyserFacade {
         jars.add(f);
       }
     }
-    printer.info("Ignoring: " + join(", ", ignored));
+    printer.warning("Ignoring: " + join(", ", ignored));
     printer.info("Directories: "+ join(", ", getPaths(dirs)));
     printer.info("Jars:" + join(", ", getPaths(jars)));
 

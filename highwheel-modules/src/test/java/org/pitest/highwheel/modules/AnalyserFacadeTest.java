@@ -57,7 +57,7 @@ public class AnalyserFacadeTest {
     try {
       testee.runAnalysis(Arrays.asList("foobar"), defaultSpec);
     } finally {
-      verify(printer).info(matches(".*Ignoring:.*foobar.*"));
+      verify(printer).warning(matches(".*Ignoring:.*foobar.*"));
     }
   }
 
@@ -66,7 +66,7 @@ public class AnalyserFacadeTest {
     testee.runAnalysis(Arrays.asList(jarPath,orgExamplePath,"foobar"),defaultSpec);
     verify(printer).info(matches(".*Jars:.*highwheel-model.*"));
     verify(printer).info(matches(".*Directories:.*test-classes.*org.*"));
-    verify(printer).info(matches(".*Ignoring:.*foobar.*"));
+    verify(printer).warning(matches(".*Ignoring:.*foobar.*"));
   }
 
   @Test(expected = AnalyserException.class)
