@@ -42,6 +42,7 @@
 		<module>highwheel-modules</module>
     <module>highwheel-utils</module>
 		<module>highwheel-modules-cli</module>
+		<module>highwheel-modules-maven</module>
 	</modules>
 
 	<!-- common dependencies used in all subprojects -->

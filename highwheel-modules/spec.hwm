@@ -1,0 +1,19 @@
+modules:
+    Core = "org.pitest.highwheel.modules.core.*"
+    ExternalAdapters = "org.pitest.highwheel.modules.externaladapters.*"
+    Model = "org.pitest.highwheel.modules.model.*"
+    Specification = "org.pitest.highwheel.modules.specification.*"
+    ModuleAnalyser = "org.pitest.highwheel.modules.ModuleAnalyser", "org.pitest.highwheel.modules.AnalyserException", "org.pitest.highwheel.modules.AnalyserModel"
+    Facade = "org.pitest.highwheel.modules.AnalyserFacade"
+
+rules:
+    Core -> Model
+    ExternalAdapters -> Model
+    Specification -> Model
+    ModuleAnalyser -> Core
+    ModuleAnalyser -> Model
+    ModuleAnalyser -> ExternalAdapters
+    Facade -> ModuleAnalyser
+    Facade -> Model
+    Facade -/-> Core
+    Facade -> Specification
