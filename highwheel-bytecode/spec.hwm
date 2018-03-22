@@ -1,0 +1,4 @@
+modules:
+    Bytecode = "org.pitest.highwheel.bytecode.*"
+
+rules:

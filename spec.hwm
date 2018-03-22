@@ -1,0 +1,37 @@
+modules:
+    Util = "org.pitest.highwheel.util.*"
+    Modules = "org.pitest.highwheel.modules.core.*", "org.pitest.highwheel.modules.externaladapters.*", "org.pitest.highwheel.modules.model.*", "org.pitest.highwheel.modules.specification.*", "org.pitest.highwheel.modules.ModuleAnalyser", "org.pitest.highwheel.modules.AnalyserException", "org.pitest.highwheel.modules.AnalyserModel",  "org.pitest.highwheel.modules.AnalyserFacade"
+    Core = "org.pitest.highwheel.algorithm.*", "org.pitest.highwheel.cycles.*", "org.pitest.highwheel.losttests.*", "org.pitest.highwheel.oracle.*", "org.pitest.highwheel.report.*", "org.pitest.highwheel.Highwheel"
+    Model = "org.pitest.highwheel.classpath.*", "org.pitest.highwheel.model.*"
+    Bytecode = "org.pitest.highwheel.bytecode.*"
+    Parser = "org.pitest.highwheel.bytecodeparser.*"
+    Ant = "org.pitest.highwheel.ant.*"
+    HighwheelMavenMain = "org.pitest.highwheel.maven.BaseMojo", "org.pitest.highwheel.maven.AnalyseMojo"
+    ModulesCli = "org.pitest.highwheel.modules.cli.*"
+    ModulesMaven = "org.pitest.highwheel.maven.ModuleAnalyserMojo"
+rules:
+    Core -> Model
+    Core -> Util
+    Parser -> Core
+    Parser -> Model
+    Parser -> Util
+    Modules -> Core
+    Modules -> Model
+    Modules -> Util
+    Modules -> Parser
+    ModulesCli -> Modules
+    ModulesCli -> Util
+    HighwheelMavenMain -> Model
+    HighwheelMavenMain -> Util
+    HighwheelMavenMain -> Core
+    HighwheelMavenMain -> Parser
+    ModulesMaven -> Modules
+    ModulesMaven -> Util
+    Ant -> Model
+    Ant -> Util
+    Ant -> Core
+    Ant -> Parser
+    Bytecode -> Model
+    Bytecode -> Util
+    Bytecode -> Core
+    Bytecode -> Parser

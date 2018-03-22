@@ -1,0 +1,4 @@
+modules:
+    Util = "org.pitest.highwheel.util.*"
+
+rules:

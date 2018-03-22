@@ -8,6 +8,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.pitest.highwheel.modules.AnalyserFacade;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -174,6 +175,11 @@ public class ModuleAnalyserMojo extends AbstractMojo {
     if (!packaging.equalsIgnoreCase("pom") && parentOnly) {
       this.getLog().info("Skipping non pom project");
       return;
+    }
+    final File attemptSpecFileInBuild = new File(project.getBasedir().getAbsolutePath() + File.separator + specFile);
+    if (attemptSpecFileInBuild.exists() && attemptSpecFileInBuild.canRead()) {
+      specFile = attemptSpecFileInBuild.getAbsolutePath();
+      getLog().info("Using specification file: " + specFile);
     }
     final List<String> roots = getRootsForProject(packaging);
     final AnalyserFacade.ExecutionMode executionMode = getExecutionMode(analysisMode);
