@@ -12,44 +12,138 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.pitest.highwheel.util.StringUtil.join;
+
 @Mojo(name = "analyse")
 public class ModuleAnalyserMojo extends AbstractMojo {
 
   private class MavenPrinter implements  AnalyserFacade.Printer {
 
-    private final String INDENTATION = "  ";
-
-    @Override
-    public void info(String msg, int indentation) {
-      getLog().info(indent(indentation) + msg);
-    }
-
-    private String indent(int num) {
-      final StringBuilder builder = new StringBuilder("");
-      for(int i =0; i < num; ++i) {
-        builder.append(INDENTATION);
-      }
-      return builder.toString();
-    }
-
     @Override
     public void info(String msg) {
       getLog().info(msg);
     }
+  }
+
+
+  private class MavenPathEventSink implements AnalyserFacade.EventSink.PathEventSink {
 
     @Override
-    public void error(String msg, int indentation) {
-      getLog().error(indent(indentation) + msg);
+    public void ignoredPaths(List<String> ignored) {
+      final String ignoredString = "Ignored: " + join(", ", ignored);
+      if(ignored.isEmpty()) {
+        getLog().info(ignoredString);
+      } else {
+        getLog().warn(ignoredString);
+      }
     }
 
     @Override
-    public void error(String msg) {
-      getLog().error(msg);
+    public void directories(List<String> directories) {
+      getLog().info("Directories: " + join(", ", directories));
     }
 
     @Override
-    public void warning(String msg) {
-      getLog().warn(msg);
+    public void jars(List<String> jars) {
+      getLog().info("Jars: " + join(", ", jars));
+    }
+  }
+
+  private class MavenMeasureSink implements AnalyserFacade.EventSink.MeasureEventSink {
+
+    @Override
+    public void fanInOutMeasure(String module, int fanIn, int fanOut) {
+      getLog().info(String.format("  %20s --> fanIn: %5d, fanOut: %5d", module, fanIn, fanOut));
+    }
+  }
+
+  private class MavenStrictAnalysisSink implements AnalyserFacade.EventSink.StrictAnalysisEventSink {
+
+    @Override
+    public void dependenciesCorrect() {
+      getLog().info("No dependency violation detected");
+    }
+
+    @Override
+    public void directDependenciesCorrect() {
+      getLog().info("No direct dependency violation detected");
+    }
+
+    @Override
+    public void dependencyViolationsPresent() {
+      getLog().error("The following dependencies violate the specification:");
+    }
+
+    @Override
+    public void dependencyViolation(String sourceModule, String destModule, List<String> expectedPath,
+        List<String> actualPath) {
+      getLog().error(String.format("  %s -> %s. Expected path: %s, Actual path: %s",
+          sourceModule,
+          destModule,
+          printGraphPath(expectedPath),
+          printGraphPath(actualPath)
+      ));
+    }
+
+    @Override
+    public void noDirectDependenciesViolationPresent() {
+      getLog().error("The following direct dependencies violate the specification:");
+    }
+
+    @Override
+    public void noDirectDependencyViolation(String sourceModule, String destModule) {
+      getLog().error(String.format("  %s -> %s",
+          sourceModule,
+          destModule
+      ));
+    }
+  }
+
+  private class MavenLooseAnalysisEventSink implements AnalyserFacade.EventSink.LooseAnalysisEventSink {
+
+    @Override
+    public void allDependenciesPresent() {
+      getLog().info(" - All dependencies specified exist");
+    }
+
+    @Override
+    public void noUndesiredDependencies() {
+      getLog().info(" - No dependency violation detected");
+    }
+
+    @Override
+    public void absentDependencyViolationsPresent() {
+      getLog().error(" - The following dependencies do not exist:");
+    }
+
+    @Override
+    public void absentDependencyViolation(String sourceModule, String destModule) {
+      getLog().error(String.format("  %s -> %s",
+          sourceModule,
+          destModule
+      ));
+    }
+
+    @Override
+    public void undesiredDependencyViolationsPresent() {
+      getLog().error(" - The following dependencies violate the specification:");
+    }
+
+    @Override
+    public void undesiredDependencyViolation(String sourceModule, String destModule, List<String> path) {
+      getLog().error(String.format("  %s -/-> %s. Actual path: %s",
+          sourceModule,
+          destModule,
+          printGraphPath(path)
+      ));
+    }
+  }
+
+  private static String printGraphPath(List<String> pathComponents) {
+    if(pathComponents.isEmpty()) {
+      return "(empty)";
+    } else {
+      return join(" -> ", pathComponents);
     }
   }
 
@@ -122,7 +216,8 @@ public class ModuleAnalyserMojo extends AbstractMojo {
   private void analyse(List<String> roots, AnalyserFacade.ExecutionMode executionMode, String specFilePath) throws MojoFailureException {
     try {
       final AnalyserFacade.Printer printer = new MavenPrinter();
-      final AnalyserFacade facade = new AnalyserFacade(printer);
+      final AnalyserFacade facade = new AnalyserFacade(printer, new MavenPathEventSink(),
+          new MavenMeasureSink(), new MavenStrictAnalysisSink(), new MavenLooseAnalysisEventSink());
       facade.runAnalysis(roots,specFilePath,executionMode);
     } catch(Exception e) {
       throw new MojoFailureException("Error during analysis: " + e.getMessage());

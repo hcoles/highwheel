@@ -3,6 +3,7 @@ package org.pitest.highwheel.modules;
 import org.jparsec.error.ParserException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.pitest.highwheel.modules.specification.CompilerException;
 
@@ -10,6 +11,9 @@ import static org.pitest.highwheel.util.StringUtil.*;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -18,6 +22,18 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class AnalyserFacadeTest {
   @Mock
   private AnalyserFacade.Printer printer;
+
+  @Mock
+  private AnalyserFacade.EventSink.PathEventSink pathEventSink;
+
+  @Mock
+  private AnalyserFacade.EventSink.MeasureEventSink measureEventSink;
+
+  @Mock
+  private AnalyserFacade.EventSink.StrictAnalysisEventSink strictAnalysisEventSink;
+
+  @Mock
+  private AnalyserFacade.EventSink.LooseAnalysisEventSink looseAnalysisEventSink;
 
   private AnalyserFacade testee;
 
@@ -34,7 +50,25 @@ public class AnalyserFacadeTest {
   @Before
   public void setUp() {
     initMocks(this);
-    testee = new AnalyserFacade(printer);
+    testee = new AnalyserFacade(printer,pathEventSink,measureEventSink,strictAnalysisEventSink,looseAnalysisEventSink);
+  }
+
+  private static class CollectionContains extends ArgumentMatcher<List<String>> {
+
+    private final String regex;
+    public CollectionContains(String regex) {
+      this.regex = regex;
+    }
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean matches(Object o) {
+      Collection<String> collection = (Collection) o;
+      return collection.stream().anyMatch((el) -> el.matches(regex));
+    }
+  }
+
+  private static  CollectionContains anyMatches(String regex) {
+    return new CollectionContains(regex);
   }
 
   @Test(expected = AnalyserException.class)
@@ -42,14 +76,14 @@ public class AnalyserFacadeTest {
     try {
       testee.runAnalysis(Arrays.asList(jarPath), defaultSpec);
     } finally {
-      verify(printer).info(matches(".*Jars:.*highwheel-model\\.jar.*"));
+      verify(pathEventSink).jars(argThat(anyMatches(".*highwheel-model\\.jar.*")));
     }
   }
 
   @Test
   public void shouldPrintAsInfoDirectoriesThatPassedAsArgument() {
     testee.runAnalysis(Arrays.asList(orgExamplePath),defaultSpec);
-    verify(printer).info(matches(".*Directories:.*test-classes.*org.*"));
+    verify(pathEventSink).directories(argThat(anyMatches(".*test-classes.*org.*")));
   }
 
   @Test(expected = AnalyserException.class)
@@ -57,16 +91,16 @@ public class AnalyserFacadeTest {
     try {
       testee.runAnalysis(Arrays.asList("foobar"), defaultSpec);
     } finally {
-      verify(printer).warning(matches(".*Ignoring:.*foobar.*"));
+      verify(pathEventSink).ignoredPaths(argThat(anyMatches(".*foobar.*")));
     }
   }
 
   @Test
   public void shouldPrintAsInfoJarsDiresAndIgnored() {
     testee.runAnalysis(Arrays.asList(jarPath,orgExamplePath,"foobar"),defaultSpec);
-    verify(printer).info(matches(".*Jars:.*highwheel-model.*"));
-    verify(printer).info(matches(".*Directories:.*test-classes.*org.*"));
-    verify(printer).warning(matches(".*Ignoring:.*foobar.*"));
+    verify(pathEventSink).jars(argThat(anyMatches(".*highwheel-model\\.jar.*")));
+    verify(pathEventSink).directories(argThat(anyMatches(".*test-classes.*org.*")));
+    verify(pathEventSink).ignoredPaths(argThat(anyMatches(".*foobar.*")));
   }
 
   @Test(expected = AnalyserException.class)
@@ -95,15 +129,15 @@ public class AnalyserFacadeTest {
   @Test
   public void strictAnalysisShouldProduceTheExpectedOutputWhenThereAreNoViolation() {
     testee.runAnalysis(Arrays.asList(orgExamplePath),defaultSpec);
-    verify(printer).info(matches(".*No dependency violation detected.*"));
-    verify(printer).info(matches(".*No direct dependency violation detected.*"));
+    verify(strictAnalysisEventSink).dependenciesCorrect();
+    verify(strictAnalysisEventSink).directDependenciesCorrect();
   }
 
   @Test
   public void looseAnalysisShouldProduceTheExpectedOutputWhenThereAreNoViolation() {
     testee.runAnalysis(Arrays.asList(orgExamplePath),looseSpec, AnalyserFacade.ExecutionMode.LOOSE);
-    verify(printer).info(matches(".*All dependencies specified exist.*"));
-    verify(printer).info(matches(".*No dependency violation detected.*"));
+    verify(looseAnalysisEventSink).allDependenciesPresent();
+    verify(looseAnalysisEventSink).noUndesiredDependencies();
   }
 
   @Test
@@ -113,14 +147,14 @@ public class AnalyserFacadeTest {
   }
 
   private void verifyStrictMetrics() {
-    verify(printer).info(matches(".*Facade.*fanIn.*2.*fanOut.*3.*"),eq(1));
-    verify(printer).info(matches(".*Utils.*fanIn.*2, fanOut.*0.*"),eq(1));
-    verify(printer).info(matches(".*IO.*fanIn.*1.*fanOut.*3.*"),eq(1));
-    verify(printer).info(matches(".*Model.*fanIn.*4.*fanOut.*0.*"),eq(1));
-    verify(printer).info(matches(".*CoreInternals.*fanIn.*1.*fanOut.*3.*"),eq(1));
-    verify(printer).info(matches(".*CoreApi.*fanIn.*4.*fanOut.*1.*"),eq(1));
-    verify(printer).info(matches(".*Controller.*fanIn.*1.*fanOut.*1.*"),eq(1));
-    verify(printer).info(matches(".*Main.*fanIn.*0.*fanOut.*4.*"),eq(1));
+    verify(measureEventSink).fanInOutMeasure("Facade",2,3);
+    verify(measureEventSink).fanInOutMeasure("Utils",2,0);
+    verify(measureEventSink).fanInOutMeasure("IO",1,3);
+    verify(measureEventSink).fanInOutMeasure("Model",4,0);
+    verify(measureEventSink).fanInOutMeasure("CoreInternals",1,3);
+    verify(measureEventSink).fanInOutMeasure("CoreApi",4,1);
+    verify(measureEventSink).fanInOutMeasure("Controller",1,1);
+    verify(measureEventSink).fanInOutMeasure("Main",0,4);
   }
 
   @Test
@@ -130,14 +164,14 @@ public class AnalyserFacadeTest {
   }
 
   private void verifyLooseMetrics() {
-    verify(printer).info(matches(".*Facade.*fanIn.*2.*fanOut.*3.*"),eq(1));
-    verify(printer).info(matches(".*Utils.*fanIn.*2, fanOut.*0.*"),eq(1));
-    verify(printer).info(matches(".*IO.*fanIn.*1.*fanOut.*3.*"),eq(1));
-    verify(printer).info(matches(".*Model.*fanIn.*4.*fanOut.*0.*"),eq(1));
-    verify(printer).info(matches(".*CoreInternals.*fanIn.*1.*fanOut.*2.*"),eq(1));
-    verify(printer).info(matches(".*CoreApi.*fanIn.*3.*fanOut.*1.*"),eq(1));
-    verify(printer).info(matches(".*Controller.*fanIn.*1.*fanOut.*1.*"),eq(1));
-    verify(printer).info(matches(".*Main.*fanIn.*0.*fanOut.*4.*"),eq(1));
+    verify(measureEventSink).fanInOutMeasure("Facade",2,3);
+    verify(measureEventSink).fanInOutMeasure("Utils",2,0);
+    verify(measureEventSink).fanInOutMeasure("IO",1,3);
+    verify(measureEventSink).fanInOutMeasure("Model",4,0);
+    verify(measureEventSink).fanInOutMeasure("CoreInternals",1,2);
+    verify(measureEventSink).fanInOutMeasure("CoreApi",3,1);
+    verify(measureEventSink).fanInOutMeasure("Controller",1,1);
+    verify(measureEventSink).fanInOutMeasure("Main",0,4);
   }
 
   @Test(expected = AnalyserException.class)
@@ -145,10 +179,10 @@ public class AnalyserFacadeTest {
     try {
       testee.runAnalysis(Arrays.asList(orgExamplePath),wrongStrictDefinitionSpec);
     } finally {
-      verify(printer).error(matches(".*The following dependencies violate the specification.*"));
-      verify(printer,atLeastOnce()).error(matches(".*IO.*->.*Utils.*"),eq(1));
-      verify(printer).error(matches(".*The following direct dependencies violate the specification.*"));
-      verify(printer,atLeastOnce()).error(matches(".*Facade.*->.*CoreInternals.*"),eq(1));
+      verify(strictAnalysisEventSink).dependencyViolationsPresent();
+      verify(strictAnalysisEventSink).dependencyViolation("IO","Utils", Collections.emptyList(),Arrays.asList("IO","Utils"));
+      verify(strictAnalysisEventSink).noDirectDependenciesViolationPresent();
+      verify(strictAnalysisEventSink).noDirectDependencyViolation("Facade","CoreInternals");
     }
   }
 
@@ -157,10 +191,10 @@ public class AnalyserFacadeTest {
     try {
       testee.runAnalysis(Arrays.asList(orgExamplePath),wrongLooseDefinitionSpec,AnalyserFacade.ExecutionMode.LOOSE);
     } finally {
-      verify(printer).error(matches(".*The following dependencies do not exist.*"));
-      verify(printer,atLeastOnce()).error(matches(".*IO.*->.*CoreInternals.*"),eq(1));
-      verify(printer).error(matches(".*The following dependencies violate the specification.*"));
-      verify(printer,atLeastOnce()).error(matches(".*IO.*-/->.*Model.*"),eq(1));
+      verify(looseAnalysisEventSink).absentDependencyViolationsPresent();
+      verify(looseAnalysisEventSink).undesiredDependencyViolationsPresent();
+      verify(looseAnalysisEventSink).absentDependencyViolation("IO","CoreInternals");
+      verify(looseAnalysisEventSink).undesiredDependencyViolation("IO","Model",Arrays.asList("IO","Model"));
     }
   }
 

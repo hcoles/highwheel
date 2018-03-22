@@ -30,17 +30,68 @@ public class AnalyserFacade {
   }
 
   public interface Printer {
-    void info(String msg, int indentation);
     void info(String msg);
-    void error(String msg, int indentation);
-    void error(String msg);
-    void warning(String msg);
+  }
+
+  public interface EventSink {
+    interface PathEventSink {
+      void ignoredPaths(List<String> ignored);
+
+      void directories(List<String> directories);
+
+      void jars(List<String> jars);
+    }
+
+    interface MeasureEventSink {
+      void fanInOutMeasure(String module, int fanIn, int fanOut);
+    }
+
+    interface StrictAnalysisEventSink {
+      void dependenciesCorrect();
+
+      void directDependenciesCorrect();
+
+      void dependencyViolationsPresent();
+
+      void dependencyViolation(String sourceModel, String destModel, List<String> expectedPath, List<String> actualPath);
+
+      void noDirectDependenciesViolationPresent();
+
+      void noDirectDependencyViolation(String sourceModule, String destModule);
+    }
+
+    interface LooseAnalysisEventSink {
+
+      void allDependenciesPresent();
+
+      void noUndesiredDependencies();
+
+      void absentDependencyViolationsPresent();
+
+      void absentDependencyViolation(String sourceModule, String destModule);
+
+      void undesiredDependencyViolationsPresent();
+
+      void undesiredDependencyViolation(String sourceModule, String destModule, List<String> path);
+    }
   }
 
   private final Printer printer;
+  private final EventSink.PathEventSink pathEventSink;
+  private final EventSink.MeasureEventSink measureEventSink;
+  private final EventSink.StrictAnalysisEventSink strictAnalysisEventSink;
+  private final EventSink.LooseAnalysisEventSink looseAnalysisEventSink;
 
-  public AnalyserFacade(Printer printer) {
+  public AnalyserFacade(final Printer printer,
+      final EventSink.PathEventSink pathEventSink,
+      final EventSink.MeasureEventSink measureEventSink,
+      final EventSink.StrictAnalysisEventSink strictAnalysisEventSink,
+      final EventSink.LooseAnalysisEventSink looseAnalysisEventSink) {
     this.printer = printer;
+    this.pathEventSink = pathEventSink;
+    this.measureEventSink = measureEventSink;
+    this.strictAnalysisEventSink = strictAnalysisEventSink;
+    this.looseAnalysisEventSink = looseAnalysisEventSink;
   }
 
 
@@ -82,9 +133,9 @@ public class AnalyserFacade {
         jars.add(f);
       }
     }
-    printer.warning("Ignoring: " + join(", ", ignored));
-    printer.info("Directories: "+ join(", ", getPaths(dirs)));
-    printer.info("Jars:" + join(", ", getPaths(jars)));
+    pathEventSink.ignoredPaths(ignored);
+    pathEventSink.directories(getPaths(dirs));
+    pathEventSink.jars(getPaths(jars));
 
     final List<ClasspathRoot> classpathRoots = new ArrayList<ClasspathRoot>();
     for(File jar : jars) {
@@ -122,19 +173,18 @@ public class AnalyserFacade {
   private void strictAnalysis(ModuleAnalyser analyser, Definition definition, ClasspathRoot classpathRoot) {
     AnalyserModel.StrictAnalysisResult analysisResult = analyser.analyseStrict(classpathRoot, definition);
     printer.info("Analysis complete");
-    printer.info("Metrics: ");
     printMetrics(analysisResult.metrics);
     boolean error = !analysisResult.dependencyViolations.isEmpty() || !analysisResult.noStrictDependencyViolations.isEmpty();
     if(analysisResult.dependencyViolations.isEmpty()) {
-      printer.info("No dependency violation detected");
+      strictAnalysisEventSink.dependenciesCorrect();
     } else {
-      printer.error("The following dependencies violate the specification:");
+      strictAnalysisEventSink.dependencyViolationsPresent();
       printDependencyViolations(analysisResult.dependencyViolations);
     }
     if(analysisResult.noStrictDependencyViolations.isEmpty()) {
-      printer.info("No direct dependency violation detected");
+      strictAnalysisEventSink.directDependenciesCorrect();
     } else {
-      printer.error("The following direct dependencies violate the specification:");
+      strictAnalysisEventSink.noDirectDependenciesViolationPresent();
       printNoDirectDependecyViolation(analysisResult.noStrictDependencyViolations);
     }
     if(error){
@@ -145,19 +195,18 @@ public class AnalyserFacade {
   private void looseAnalysis(ModuleAnalyser analyser, Definition definition, ClasspathRoot classpathRoot){
     AnalyserModel.LooseAnalysisResult analysisResult = analyser.analyseLoose(classpathRoot, definition);
     printer.info("Analysis complete");
-    printer.info("Metrics: ");
     printMetrics(analysisResult.metrics);
     boolean error = !analysisResult.absentDependencyViolations.isEmpty() || !analysisResult.undesiredDependencyViolations.isEmpty();
     if(analysisResult.absentDependencyViolations.isEmpty()) {
-      printer.info("All dependencies specified exist");
+      looseAnalysisEventSink.allDependenciesPresent();
     } else {
-      printer.error("The following dependencies do not exist:");
+      looseAnalysisEventSink.absentDependencyViolationsPresent();
       printAbsentDependencies(analysisResult.absentDependencyViolations);
     }
     if(analysisResult.undesiredDependencyViolations.isEmpty()) {
-      printer.info("No dependency violation detected");
+      looseAnalysisEventSink.noUndesiredDependencies();
     } else {
-      printer.error("The following dependencies violate the specification:");
+      looseAnalysisEventSink.undesiredDependencyViolationsPresent();
       printUndesiredDependencies(analysisResult.undesiredDependencyViolations);
     }
     if(error){
@@ -167,40 +216,46 @@ public class AnalyserFacade {
 
   private void printMetrics(Collection<AnalyserModel.Metrics> metrics) {
     for(AnalyserModel.Metrics m : metrics) {
-      printer.info(String.format("%20s --> fanIn: %5d, fanOut: %5d", m.module, m.fanIn,m.fanOut),1);
+      measureEventSink.fanInOutMeasure(m.module,m.fanIn,m.fanOut);
     }
   }
 
   private void printDependencyViolations(Collection<AnalyserModel.DependencyViolation> violations) {
     for(AnalyserModel.DependencyViolation violation: violations) {
-      printer.error(String.format("%s -> %s. Expected path: %s, Actual path: %s",
-          violation.sourceModule,
-          violation.destinationModule,
-          violation.specificationPath.isEmpty() ? "(empty)" : violation.sourceModule + " -> " + join(" -> ", violation.specificationPath),
-          violation.actualPath.isEmpty() ? "(empty)" : violation.sourceModule + " -> " + join(" -> ", violation.actualPath)),1);
+      strictAnalysisEventSink.dependencyViolation(violation.sourceModule,violation.destinationModule,
+          appendStartIfNotEmpty(violation.specificationPath,violation.sourceModule),
+          appendStartIfNotEmpty(violation.actualPath,violation.sourceModule));
     }
   }
 
+  private <T> List<T> appendStartIfNotEmpty(List<T> collection, T element) {
+    if(collection.isEmpty()) {
+      return collection;
+    } else {
+      final List<T> result = new ArrayList<>(collection.size() + 1);
+      result.add(element);
+      result.addAll(collection);
+      return result;
+    }
+  }
   private void printNoDirectDependecyViolation(Collection<AnalyserModel.NoStrictDependencyViolation> violations) {
     for(AnalyserModel.NoStrictDependencyViolation violation: violations) {
-      printer.error(String.format("%s -> %s",
-          violation.sourceModule,
-          violation.destinationModule),1);
+      strictAnalysisEventSink.noDirectDependencyViolation(violation.sourceModule, violation.destinationModule);
     }
   }
 
   private void printAbsentDependencies(Collection<AnalyserModel.AbsentDependencyViolation> violations) {
     for(AnalyserModel.AbsentDependencyViolation violation: violations) {
-      printer.error(String.format("%s -> %s",violation.sourceModule,violation.destinationModule),1);
+      looseAnalysisEventSink.absentDependencyViolation(violation.sourceModule,violation.destinationModule);
     }
   }
 
   private void printUndesiredDependencies(Collection<AnalyserModel.UndesiredDependencyViolation> violations) {
     for(AnalyserModel.UndesiredDependencyViolation violation: violations) {
-      printer.error(String.format("%s -/-> %s. Actual dependency path: %s",
+      looseAnalysisEventSink.undesiredDependencyViolation(
           violation.sourceModule,
           violation.destinationModule,
-          violation.evidence.isEmpty() ? "(empty)" : violation.sourceModule + " -> " + join(" -> ", violation.evidence)),1);
+          appendStartIfNotEmpty(violation.evidence,violation.sourceModule));
     }
   }
 
