@@ -1,0 +1,4 @@
+modules:
+    Maven = "org.pitest.highwheel.maven.*"
+
+rules:

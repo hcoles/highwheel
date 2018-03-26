@@ -1,0 +1,5 @@
+modules:
+    Main = "org.pitest.highwheel.modules.cli.Main"
+    CmdParser = "org.pitest.highwheel.modules.cli.CmdParser"
+rules:
+    Main -> CmdParser

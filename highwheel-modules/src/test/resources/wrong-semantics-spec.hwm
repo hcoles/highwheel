@@ -1,0 +1,14 @@
+modules:
+    Main = "org.example.Main"
+    Controller = "org.example.controller.*"
+    Facade = "org.example.core.CoreFacade"
+    CoreInternals = "org.example.core.internals.*"
+    CoreApi = "org.example.core.api.*", "org.example.core.otherapi.*"
+    Model = "org.example.core.model.*"
+    IO = "org.example.io.*"
+    Utils = "org.example.commons.*"
+rules:
+    Main -> Controller -> Facade
+    Main -/-> CoreInternals
+    Controller -/-> NON_EXISTING_MODULE
+    Main -> Utils

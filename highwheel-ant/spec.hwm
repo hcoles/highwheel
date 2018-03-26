@@ -1,0 +1,4 @@
+modules:
+    Ant = "org.pitest.highwheel.ant.*"
+
+rules:

@@ -1,0 +1,19 @@
+modules:
+    Main = "org.example.Main"
+    Controller = "org.example.controller.*"
+    Facade = "org.example.core.CoreFacade"
+    CoreInternals = "org.example.core.internals.*"
+    CoreApi = "org.example.core.api.*"
+    Model = "org.example.core.model.*"
+    IO = "org.example.io.*"
+    Utils = "org.example.commons.*"
+rules:
+    Main -> Controller -> Facade
+    Main -> Model
+    Main -> IO
+    Facade -> CoreInternals -> Model
+    CoreApi -> Model
+    IO -> CoreApi
+    IO -/-> Model // WRONG
+    IO -> CoreInternals // WRONG
+    Utils -/-> Main
