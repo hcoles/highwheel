@@ -25,7 +25,7 @@ class DependencyClassVisitor extends ClassVisitor {
 
   public DependencyClassVisitor(final ClassVisitor visitor,
       final AccessVisitor typeReceiver, NameTransformer nameTransformer) {
-    super(Opcodes.ASM5, visitor);
+    super(Opcodes.ASM6, visitor);
     this.dependencyVisitor = filterOutJavaLangObject(typeReceiver);
     this.nameTransformer = nameTransformer;
   }
