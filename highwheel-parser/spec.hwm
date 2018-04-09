@@ -1,4 +1,0 @@
-modules:
-    Parser = "org.pitest.highwheel.bytecodeparser.*"
-
-rules:

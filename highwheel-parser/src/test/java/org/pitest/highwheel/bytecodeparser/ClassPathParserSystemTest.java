@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Supplier;
 
-import com.example.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -25,6 +23,23 @@ import org.pitest.highwheel.model.AccessPointName;
 import org.pitest.highwheel.model.AccessType;
 import org.pitest.highwheel.model.ElementName;
 
+import com.example.AnException;
+import com.example.AnInterface;
+import com.example.CallsFooMethod;
+import com.example.ConstructsAFoo;
+import com.example.DeclaresAnException;
+import com.example.ExtendsFoo;
+import com.example.Foo;
+import com.example.HasArrayOfFooAsMember;
+import com.example.HasFooArrayAsParameter;
+import com.example.HasFooAsMember;
+import com.example.HasFooAsParameter;
+import com.example.HasMainMethod;
+import com.example.ImplementsAnInterface;
+import com.example.ReturnsAFoo;
+import com.example.ReturnsArrayOfFoo;
+import com.example.Unconnected;
+import com.example.UsesFieldOnFoo;
 import com.example.annotated.AnAnnotation;
 import com.example.annotated.AnnotatedAtClassLevel;
 import com.example.annotated.AnnotatedAtFieldLevel;
@@ -273,19 +288,6 @@ public class ClassPathParserSystemTest {
     parseClassPath(Foo.class);
     verify(this.v, never()).newEntryPoint(any(ElementName.class));
   }
-
-  @Test
-  public void shouldDetectUsesAnInteraceInMethod() {
-    parseClassPath(UsesAnInterfaceInMethod.class);
-    verify(this.v).apply(access(UsesAnInterfaceInMethod.class,method("foo","()V")),accessAType(AnInterface.class),AccessType.USES);
-  }
-
-  @Test
-  public void shouldDetectUsageOfMethodReference() {
-    parseClassPath(UsesMethodReference.class);
-    verify(this.v).apply(access(UsesMethodReference.class,method("foo","()V")),access(Foo.class,method("aMethod","()Ljava/lang/Object;")),AccessType.USES);
-  }
-
 
   private Filter matchOnlyExampleDotCom() {
     return new Filter() {

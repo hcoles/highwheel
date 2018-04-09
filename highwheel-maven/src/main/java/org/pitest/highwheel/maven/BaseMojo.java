@@ -21,14 +21,14 @@ import org.pitest.highwheel.util.GlobToRegex;
 
 /**
  * Base mojo for analysis mojos that require a class filter
- *
+ * 
  */
 public abstract class BaseMojo extends AbstractMojo {
 
   /**
    * <i>Internal</i>: Project to interact with.
    * 
-   * @parameter property="project"
+   * @parameter expression="${project}"
    * @required
    * @readonly
    */
@@ -37,21 +37,21 @@ public abstract class BaseMojo extends AbstractMojo {
   /**
    * Classes to include in analyse. Glob syntax
    * 
-   * @parameter default="" property="classFilter"
+   * @parameter default="" expression="${classFilter}"
    */
   private String       classFilter;
 
   /**
    * Analyse only parent (i.e pom) projects
    * 
-   * @parameter default="false" property="parentOnly"
+   * @parameter default="false" expression="${parentOnly}"
    */
   private boolean      parentOnly;
 
   /**
    * Analyse only child projects i.e do not analyse parent projects
    * 
-   * @parameter default="false" property="childOnly"
+   * @parameter default="false" expression="${childOnly}"
    */
   private boolean      childOnly;
 

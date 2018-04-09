@@ -1,6 +1,0 @@
-modules:
-    Classpath = "org.pitest.highwheel.classpath.*"
-    Model = "org.pitest.highwheel.model.*"
-
-rules:
-    Classpath -> Model
