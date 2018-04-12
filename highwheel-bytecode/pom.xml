@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>highwheel-parent</artifactId>
 		<groupId>org.pitest</groupId>
-		<version>1.3-SNAPSHOT</version>
+		<version>1.3</version>
 	</parent>
 	<artifactId>highwheel-bytecode</artifactId>
 	<packaging>maven-plugin</packaging>
