@@ -1,8 +1,8 @@
 package org.pitest.highwheel.bytecodeparser;
 
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.pitest.highwheel.classpath.AccessVisitor;
 import org.pitest.highwheel.classpath.ClasspathRoot;
 import org.pitest.highwheel.cycles.Filter;
@@ -53,7 +55,7 @@ public class ClassPathParserTest {
     when(this.filter.include(foo)).thenReturn(true);
     final InputStream is = Mockito.mock(InputStream.class);
     when(this.cp.getData(foo)).thenReturn(is);
-    when(is.read()).thenThrow(new IOException());
+    doThrow(new IOException()).when(is).read(any(), eq(0), anyInt());
     try {
       this.testee.parse(cp,this.v);
     } catch (final IOException ex) {
