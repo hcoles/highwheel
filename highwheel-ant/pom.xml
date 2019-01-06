@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>highwheel-parent</artifactId>
 		<groupId>org.pitest</groupId>
-		<version>1.4-SNAPSHOT</version>
+		<version>1.4</version>
 	</parent>
 	<artifactId>highwheel-ant</artifactId>
 	<name>highwheel-ant</name>
