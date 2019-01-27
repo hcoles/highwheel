@@ -17,7 +17,7 @@ class DependencyMethodVisitor extends MethodVisitor {
 
   public DependencyMethodVisitor(final AccessPoint owner,
       final AccessVisitor typeReceiver, NameTransformer nameTransformer) {
-    super(Opcodes.ASM6, null);
+    super(Opcodes.ASM7, null);
     this.typeReceiver = typeReceiver;
     this.parent = owner;
     this.nameTransformer = nameTransformer;
