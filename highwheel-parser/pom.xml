@@ -41,12 +41,9 @@
 			<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
-				<version>0.31</version>
+				<version>1.4.5</version>
 				<configuration>
 					<timestampedReports>false</timestampedReports>
-					<targetClasses>
-						<param>org.pitest.highwheel*</param>
-					</targetClasses>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -67,7 +64,7 @@
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm</artifactId>
-			<version>7.0</version>
+			<version>7.1</version>
 		</dependency>
 		
 	</dependencies>
