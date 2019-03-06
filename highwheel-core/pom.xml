@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>highwheel-parent</artifactId>
 		<groupId>org.pitest</groupId>
-		<version>1.5</version>
+		<version>1.6-SNAPSHOT</version>
 	</parent>
 	<artifactId>highwheel-core</artifactId>
 	<packaging>jar</packaging>
