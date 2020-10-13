@@ -221,7 +221,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<hamcrest.version>1.3</hamcrest.version>
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<surefire.version>2.22.2</surefire.version>
 		<asm.version>8.0.1</asm.version>
 	</properties>
