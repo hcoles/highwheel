@@ -102,6 +102,9 @@
 					</dependencies>
 					<configuration>
 						<testNGArtifactName>none:none</testNGArtifactName>
+						<parallel>classes</parallel>
+						<useUnlimitedThreads>true</useUnlimitedThreads>
+
 					</configuration>
 				</plugin>
 				<plugin>
